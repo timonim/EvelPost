@@ -5,7 +5,8 @@ const textSizeSlider = document.getElementById('text-size');
 const namePreviewTemplate = `
     <span id="first-name"></span>&nbsp;
     <span id="nick-name"></span>
-    <span id="last-name"></span> ז"ל
+    <span id="last-name"></span>
+    <span style="font-size: 0.5em">ז"ל</span>
 `;
 
 function updatePreview() {
@@ -34,9 +35,7 @@ function updatePreview() {
 
     // Update font size based on slider
     const fontSize = `${textSizeSlider.value}px`;
-    for (const element of namePreviewElement.querySelectorAll('span')) {
-      element.style.fontSize = fontSize;
-    }
+    namePreviewElement.style.fontSize = fontSize;
 
     // Update obituary text with formatted date and day of week
     const selectedDate = new Date(values['date-of-burial']);

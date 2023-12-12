@@ -74,18 +74,22 @@ input, textarea {
     background: transparent;
     margin: 20px 0; /* Adjust margin as needed */
 }
-  
+
+.name-preview {
+    font-size: 80px;
+}
+
 #preview-content #first-name,
 #preview-content #last-name {
     font-weight: 900;
-    font-size: 48px;
+    font-size: 2em;
     font-stretch: 80%;
     line-height: 80px;
 }
 
 #preview-content span.nick-name {
     font-weight: 900;
-    font-size: 28px;
+    font-size: 1em;
     font-stretch: 80%;
 }
 
