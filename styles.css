@@ -1,0 +1,112 @@
+body {
+    font-family: 'Noto Sans Hebrew', sans-serif;
+    margin: 20px;
+    direction: rtl;
+    background-color: rgb(236, 234, 228);
+    /* margin: 10% 4% 4% 10%; */
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+
+h1 {
+    text-align: center;
+}
+
+#obituary-form {
+    max-width: 400px;
+    margin: auto;
+}
+
+label {
+    display: block;
+    margin-top: 10px;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+#obituary-preview {
+    position: relative;
+    background-color: white;
+    width: 29.7cm; /* A4 height */
+    height: 21cm; /* A4 width */
+    overflow: hidden;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
+}
+
+#preview-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: 1.6em;
+    border: 20px solid #000000;
+    font-size: 28px;
+    font-weight: 600;
+    text-align: center; /* Center the text horizontally */
+    box-sizing: border-box;
+    overflow: auto;
+    padding: 1em;
+}
+
+#preview-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 90%; /* Ensure the container takes the full height */
+}
+
+#preview-content hr {
+    border: 0;
+    height: 1px;
+    background: transparent;
+    margin: 20px 0; /* Adjust margin as needed */
+}
+  
+#preview-content #first-name,
+#preview-content #last-name {
+    font-weight: 900;
+    font-size: 48px;
+    font-stretch: 80%;
+    line-height: 80px;
+}
+
+#preview-content span.nick-name {
+    font-weight: 900;
+    font-size: 28px;
+    font-stretch: 80%;
+}
+
+#obituary-preview span.location-of-burial {
+    font-weight: bold;
+    color: #663399;
+}
+
+#bottom {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: flex-end;
+}
+
+#obituary-preview span.shiva {
+text-align: right;
+}
+
+#obituary-preview span.grievers {
+    text-align: left;
+    font-weight: 800;
+
+}

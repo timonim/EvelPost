@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Obituary Generator</title>
+    <link rel="stylesheet" href="styles.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wdth,wght@62.5..100,100..900&display=swap" rel="stylesheet">
+
+</head>
+<body>
+    <h1>מודעת אבל</h1>
+    <form id="obituary-form">
+        <label for="relation">קרבה</label>
+        <input type="text" id="relation" required placeholder="הזן קרבה">
+
+        <label for="first-name">שם פרטי</label>
+        <input type="text" id="first-name" required placeholder="הזן שם פרטי">
+
+        <label for="last-name">שם משפחה</label>
+        <input type="text" id="last-name" required placeholder="הזן שם משפחה">
+
+        <label for="text-size">גודל טקסט</label>
+        <input type="range" id="text-size" min="80" max="164" step="1" value="80">        
+
+        <label for="show-nick-name">הצג כינוי</label>
+        <input type="checkbox" id="show-nick-name" class="toggle-checkbox">
+
+        <label for="nick-name">כינוי</label>
+        <input type="text" id="nick-name" required placeholder="הזן כינוי">
+
+        <label for="date-of-burial">תאריך ההלוויה</label>
+        <input type="date" id="date-of-burial" required>
+
+        <label for="hour-of-burial">שעת ההלוויה</label>
+        <input type="time" id="hour-of-burial" required>
+
+        <label for="location-of-burial">כתובת בית העלמין</label>
+        <input type="text" id="location-of-burial" required placeholder="הזן כתובת">
+
+        <label for="shiva">מקום השבעה</label>
+        <textarea id="shiva" rows="3" placeholder="כתוב כאן את מקום השבעה"></textarea>
+
+        <label for="grievers">האבלים</label>
+        <textarea id="grievers" rows="3" placeholder="כתוב כאן את מקום השבעה"></textarea>
+    </form>
+
+    <h2>תצוגה מקדימה למודעת אבל</h2>
+    <div id="obituary-preview">
+             <div id="preview-content">
+              <!-- Obituary preview content here -->
+             </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
