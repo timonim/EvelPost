@@ -2,8 +2,28 @@ const form = document.getElementById('obituary-form');
 const previewElement = document.getElementById('preview-content');
 const textSizeSlider = document.getElementById('text-size');
 
+const nickNameField = document.getElementById('nick-name');
+const nickNameLabel = document.querySelector("label[for='nick-name']");
+
+const toggle = document.getElementById('show-nick-name');
+
+function updateNicknameVisibility() {
+  if(toggle.checked) {
+    nickNameField.style.display = 'block';
+    nickNameLabel.style.display = 'block';
+  } else {
+    nickNameField.style.display = 'none';
+    nickNameLabel.style.display = 'none';
+  }
+}
+
+// Initial call
+updateNicknameVisibility();
+
+toggle.addEventListener('change', updateNicknameVisibility);
+
 const namePreviewTemplate = `
-    <span id="first-name"></span>&nbsp;
+    <span id="first-name"></span>
     <span id="nick-name"></span>
     <span id="last-name"></span>
     <span style="font-size: 0.5em">ז"ל</span>
@@ -11,13 +31,15 @@ const namePreviewTemplate = `
 
 function updatePreview() {
   try {
-    const inputs = Array.from(form.elements);
-    const values = inputs.reduce((acc, input) => {
-      if (input.type !== 'submit') {
-        acc[input.id] = input.value;
-      }
-      return acc;
-    }, {});
+    // Get divs
+    const formFields = form.querySelectorAll('.form-field');
+
+    // Build values object
+    const values = {};
+    formFields.forEach(field => {
+      const input = field.querySelector('input, textarea');  
+      values[input.id] = input.value;
+    });
 
     // Update name preview dynamically
     const namePreviewElement = document.createElement('name-preview');
