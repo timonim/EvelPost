@@ -1,6 +1,6 @@
 body {
     font-family: 'Noto Sans Hebrew', sans-serif;
-    margin: 20px;
+    margin: 2em;
     direction: rtl;
     background-color: rgb(236, 234, 228);
     /* margin: 10% 4% 4% 10%; */
@@ -10,31 +10,124 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    min-height: 100vh;
+    gap: 2em;
 }
-
 
 h1 {
     text-align: center;
+    font-size: 4em ;
 }
 
-#obituary-form {
-    max-width: 400px;
-    margin: auto;
+h4 {
+    text-align: right;
+    width: 100%;
+    font-size: 1.1em ;
+    font-weight: bold;
+    color: #444;
+margin: 0;
+padding-top: 0.5em;
+}
+
+h3 {
+    text-align: center;
+    font-size: 1.4em ;
+    color: #666;
+}
+
+.form-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1em;
+    background-color: #e6dcca;
+    padding: 1em;
+    border-radius: 8px;
+    width: 100%;
+}
+
+.fields-horz {
+    display: flex;
+    flex-direction: row;
+    gap: 1em;
+    width: 100%;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3em;
+    width: 100%;
+}
+
+.form-toggle {
+    display: flex;
+    flex-direction: row;
+    gap: 0.4em;
+    width: 100%;
+}
+
+.toggle-checkbox {
+    display: block;
+    width: 1em;
 }
 
 label {
     display: block;
-    margin-top: 10px;
+  font-weight: bold;
+  color: #333;
+    float: right;
 }
 
-input, textarea {
-    width: 100%;
-    padding: 8px;
-    margin-top: 5px;
-    margin-bottom: 10px;
+input {
+    display: block;
+  /* width: 100%; */
+  padding: 0.8em;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  font-size: 16px;
 }
+
+textarea {
+  display: block;
+  /* width: 100%; */
+  height: 3em;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 2px;
+  resize: none;
+}
+
+input[type="range"] {
+    /* width: 100%; */
+    margin: 10px 0;
+    background-color: #eee;
+    height: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    background-color: #333;
+    width: 1em;
+    height: 1em;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  
+  #obituary-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* width: 50%; */
+    gap: 1em;
+    /* font-size: 1em; */
+    font-weight: 500;
+  }
+
+
+/* Obituary Preview Section */
 
 #obituary-preview {
     position: relative;
@@ -46,11 +139,11 @@ input, textarea {
 }
 
 #preview-content {
-    position: absolute;
+    /* position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    bottom: 0;
+    bottom: 0; */
     margin: 1.6em;
     border: 20px solid #000000;
     font-size: 28px;
@@ -68,6 +161,7 @@ input, textarea {
     height: 90%; /* Ensure the container takes the full height */
 }
 
+/* Spacer */
 #preview-content hr {
     border: 0;
     height: 1px;
@@ -75,27 +169,23 @@ input, textarea {
     margin: 20px 0; /* Adjust margin as needed */
 }
 
+/* 
 .name-preview {
-    font-size: 80px;
-}
+    font-size: 20px;
+} */
 
 #preview-content #first-name,
 #preview-content #last-name {
     font-weight: 900;
     font-size: 2em;
     font-stretch: 80%;
-    line-height: 80px;
+    line-height: 1em;
 }
 
-#preview-content span.nick-name {
+#preview-content #nick-name {
     font-weight: 900;
     font-size: 1em;
     font-stretch: 80%;
-}
-
-#obituary-preview span.location-of-burial {
-    font-weight: bold;
-    color: #663399;
 }
 
 #bottom {
@@ -114,3 +204,4 @@ text-align: right;
     font-weight: 800;
 
 }
+
