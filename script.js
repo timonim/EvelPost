@@ -56,31 +56,61 @@ function updatePreview() {
     lastNameElement.textContent = values['last-name'];
 
     // Update font size based on slider
-    const fontSize = `${textSizeSlider.value}px`;
+    const fontSize = `${textSizeSlider.value}vw`;
     namePreviewElement.style.fontSize = fontSize;
 
     // Update obituary text with formatted date and day of week
-    const selectedDate = new Date(values['date-of-burial']);
-    const formattedDate = selectedDate.toLocaleDateString('he-IL');
-    const dayOfWeek = selectedDate.toLocaleDateString('he-IL', { weekday: 'long' });
+  const selectedDateInput = values['date-of-burial'];
+let formattedDate = '';
+let hebrewFormattedDate = '';
+let dayOfWeek = '';
 
-    const obituaryText = `
-      <div id="intro">
-        בצער רב אנו מודיעים על פטירתו של <br><span class="relation">${values['relation']}</span>
-      </div>
+if (selectedDateInput) {
+    const selectedDate = new Date(selectedDateInput);
 
-      ${namePreviewElement.outerHTML}
+    if (!isNaN(selectedDate.getTime())) {
+        // The selected date is valid
+        formattedDate = selectedDate.toLocaleDateString('he-IL');
+        hebrewFormattedDate = getHebrewFormattedDate(selectedDate); // Add function to get Hebrew formatted date
+        dayOfWeek = selectedDate.toLocaleDateString('he-IL', { weekday: 'long' });
+    } else {
+        // The selected date is invalid
+        console.error('Invalid date selected');
+    }
+} else {
+    // No date chosen yet
+    console.log('No date chosen yet');
+}
 
-      הלוויה תתקיים ביום ${dayOfWeek}, ${formattedDate} בשעה ${values['hour-of-burial']}.
-      <br>
-      ${values['location-of-burial']}
+// Function to get Hebrew formatted date
+function getHebrewFormattedDate(date) {
+    const hebrewDate = new Intl.DateTimeFormat('he-IL-u-ca-hebrew', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    }).format(date);
 
-      <div id="bottom">
-      <span class="shiva"> ${values.shiva.replace(/\n/g, '<br>')}</span>
-        <span class="grievers">${values['grievers']}</span>
-      </div>
-      </div>
-    `;
+    return hebrewDate;
+}
+
+// Now you can use formattedDate, hebrewFormattedDate, and dayOfWeek in your obituaryText
+const obituaryText = `
+  <div id="intro">
+    בצער רב אנו מודיעים על פטירתו של <br><span class="relation">${values['relation']}</span>
+  </div>
+
+  ${namePreviewElement.outerHTML}
+
+  הלוויה תתקיים ב${dayOfWeek}, ${formattedDate} (${hebrewFormattedDate}) בשעה ${values['hour-of-burial']}.
+  <br>
+  ${values['location-of-burial']}
+
+  <div id="bottom">
+  <span class="shiva"> ${values.shiva.replace(/\n/g, '<br>')}</span>
+    <span class="grievers">${values['grievers']}</span>
+  </div>
+</div>`;
+
 
     // Update preview text
     previewElement.innerHTML = obituaryText;
