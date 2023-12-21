@@ -173,7 +173,6 @@ input[type="range"] {
     margin: 10px 0;
     background-color: #eee;
     accent-color: #b47553;
-
     height: 5px;
     border-radius: 5px;
     cursor: pointer;
@@ -211,7 +210,9 @@ input[type="range"] {
     width: 93%;
     margin: 4%;
     border: 1.4vw solid #000000;
-    font-size: 1.4vw;    font-weight: 600;
+    font-size: 1.4vw;    
+    font-weight: 600;
+    font-stretch: 80%;
     text-align: center; /* Center the text horizontally */
     box-sizing: border-box;
     overflow: auto;
