@@ -22,6 +22,7 @@ updateNicknameVisibility();
 
 toggle.addEventListener('change', updateNicknameVisibility);
 
+// Name preview template
 const namePreviewTemplate = `
     <span id="first-name"></span>
     <span id="nick-name"></span>
@@ -37,7 +38,7 @@ function updatePreview() {
     // Build values object
     const values = {};
     formFields.forEach(field => {
-      const input = field.querySelector('input, textarea');  
+      const input = field.querySelector('input, textarea');
       values[input.id] = input.value;
     });
 
@@ -50,7 +51,7 @@ function updatePreview() {
 
     const showNickName = document.getElementById('show-nick-name').checked;
     const nickNameElement = namePreviewElement.querySelector('#nick-name');
-    nickNameElement.textContent = showNickName ? values['nick-name'] : '';
+    nickNameElement.textContent = showNickName ? `(${values['nick-name']})` : '';
 
     const lastNameElement = namePreviewElement.querySelector('#last-name');
     lastNameElement.textContent = values['last-name'];
@@ -60,57 +61,59 @@ function updatePreview() {
     namePreviewElement.style.fontSize = fontSize;
 
     // Update obituary text with formatted date and day of week
-  const selectedDateInput = values['date-of-burial'];
-let formattedDate = '';
-let hebrewFormattedDate = '';
-let dayOfWeek = '';
+    const selectedDateInput = values['date-of-burial'];
+    let formattedDate = '';
+    let hebrewFormattedDate = '';
+    let dayOfWeek = '';
 
-if (selectedDateInput) {
-    const selectedDate = new Date(selectedDateInput);
+    if (selectedDateInput) {
+      const selectedDate = new Date(selectedDateInput);
 
-    if (!isNaN(selectedDate.getTime())) {
+      if (!isNaN(selectedDate.getTime())) {
         // The selected date is valid
         formattedDate = selectedDate.toLocaleDateString('he-IL');
         hebrewFormattedDate = getHebrewFormattedDate(selectedDate); // Add function to get Hebrew formatted date
         dayOfWeek = selectedDate.toLocaleDateString('he-IL', { weekday: 'long' });
-    } else {
+      } else {
         // The selected date is invalid
         console.error('Invalid date selected');
+      }
+    } else {
+      // No date chosen yet
+      console.log('No date chosen yet');
     }
-} else {
-    // No date chosen yet
-    console.log('No date chosen yet');
-}
 
-// Function to get Hebrew formatted date
-function getHebrewFormattedDate(date) {
-    const hebrewDate = new Intl.DateTimeFormat('he-IL-u-ca-hebrew', {
+    // Function to get Hebrew formatted date
+    function getHebrewFormattedDate(date) {
+      const hebrewDate = new Intl.DateTimeFormat('he-IL-u-ca-hebrew', {
         year: 'numeric',
         month: 'long',
         day: 'numeric'
-    }).format(date);
+      }).format(date);
 
-    return hebrewDate;
-}
+      return hebrewDate;
+    }
 
-// Now you can use formattedDate, hebrewFormattedDate, and dayOfWeek in your obituaryText
-const obituaryText = `
-  <div id="intro">
-    בצער רב אנו מודיעים על פטירתו של <br><span class="relation">${values['relation']}</span>
-  </div>
+    // Update preview with Hebrew formatted date
+    const showHebrewDate = document.getElementById('show-hebrew-date').checked;
+    
+    // Obituary text
+    const obituaryText = `
+      <div id="intro">
+        בצער רב אנו מודיעים על פטירתו של <br><span class="relation">${values['relation']}</span>
+      </div>
 
-  ${namePreviewElement.outerHTML}
+      ${namePreviewElement.outerHTML}
 
-  הלוויה תתקיים ב${dayOfWeek}, ${formattedDate} (${hebrewFormattedDate}) בשעה ${values['hour-of-burial']}.
-  <br>
-  ${values['location-of-burial']}
+      הלוויה תתקיים ב${dayOfWeek}, ${formattedDate} ${showHebrewDate ? `(${hebrewFormattedDate})` : ''} בשעה ${values['hour-of-burial']}.
+      <br>
+      ${values['location-of-burial']}
 
-  <div id="bottom">
-  <span class="shiva"> ${values.shiva.replace(/\n/g, '<br>')}</span>
-    <span class="grievers">${values['grievers']}</span>
-  </div>
-</div>`;
-
+      <div id="bottom">
+      <span class="shiva"> ${values.shiva.replace(/\n/g, '<br>')}</span>
+        <span class="grievers">${values['grievers']}</span>
+      </div>
+    </div>`;
 
     // Update preview text
     previewElement.innerHTML = obituaryText;
