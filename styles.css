@@ -2,20 +2,25 @@ body {
     font-family: 'Noto Sans Hebrew', sans-serif;
     margin: 2em;
     direction: rtl;
-    background-color: rgb(236, 234, 228);
+    background-color: #f8f6f3   ;
     /* margin: 10% 4% 4% 10%; */
 }
 
 body {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    gap: 2em;
+    gap: 10%;
+    justify-content: center;
 }
 
 h1 {
     text-align: center;
-    font-size: 4em ;
+    font-size: 4vw ;
+    color: #936b51  ;
+    font-stretch: 80%;
+margin: 0;
+    
 }
 
 h4 {
@@ -34,13 +39,25 @@ h3 {
     color: #666;
 }
 
+/* form coulmn*/
+
+#obituary-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: min(100%, 30em);
+    gap: 1em;
+    font-weight: 500;
+  }
+
 .form-container {
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     gap: 1em;
-    background-color: #e6dcca;
+    background-color: #ede3dc   ;
     padding: 1em;
     border-radius: 8px;
     width: 100%;
@@ -56,41 +73,88 @@ h3 {
 .form-field {
     display: flex;
     flex-direction: column;
-    gap: 0.3em;
+    gap: 0.4em;
     width: 100%;
 }
 
 .form-toggle {
     display: flex;
     flex-direction: row;
-    gap: 0.4em;
+    gap: 0.6em;
     width: 100%;
 }
 
+/* checkbox styling */
+
 .toggle-checkbox {
-    display: block;
-    width: 1em;
+    display: grid;
+  place-content: center;
+  width: 1.6em;
+  height: 1.6em;
 }
 
+input[type="checkbox"] {
+    /* Add if not using autoprefixer */
+    -webkit-appearance: none;
+    appearance: none;
+    /* For iOS < 15 to remove gradient background */
+    background-color: #fff;
+    /* Not removed via appearance */
+    margin: 0;
+  }
+
+  input[type="checkbox"]::before {
+    content: "";
+    width: 0.65em;
+    height: 0.65em;
+    clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+    transform: scale(0);
+    transform-origin: bottom left;
+    transition: 120ms transform ease-in-out;
+    /* Windows High Contrast Mode */
+    background-color: CanvasText;
+    box-shadow: inset 1em 1em #333;
+
+  }
+  
+  input[type="checkbox"]:checked::before {
+    transform: scale(1);
+  }
+  
+  input[type="checkbox"]:focus {
+    outline: max(2px, 0.15em) solid #936b51;
+    outline-offset: max(2px, 0.15em);
+  }
+
+/* Text fields */
+
 label {
-    display: block;
   font-weight: bold;
-  color: #333;
+  color: #655a4e;
     float: right;
+    display: flex;
+    justify-content: flex-start; /* Align horizontal */
+    align-items: center; /* Align vertical */
 }
 
 input {
-    display: block;
-  /* width: 100%; */
-  padding: 0.8em;
-  border: 1px solid #ddd;
-  border-radius: 3px;
-  font-size: 16px;
-}
+    width: min(100%, 100em);
+    box-sizing: border-box;
+    padding: 0.8em 0.6em;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-family: 'Noto Sans Hebrew', sans-serif;
+    font-size: 1em;
+  }
+
+  input:focus {
+    outline: 1px solid #666;
+  }
 
 textarea {
   display: block;
-  /* width: 100%; */
+  font-family: 'Noto Sans Hebrew', sans-serif;
+  font-size: 1em;
   height: 3em;
   padding: 8px;
   border: 1px solid #ddd;
@@ -98,10 +162,18 @@ textarea {
   resize: none;
 }
 
+textarea:focus {
+    outline: 1px solid #666;
+}
+
+/* slider */
+
 input[type="range"] {
     /* width: 100%; */
     margin: 10px 0;
     background-color: #eee;
+    accent-color: #b47553;
+
     height: 5px;
     border-radius: 5px;
     cursor: pointer;
@@ -115,50 +187,35 @@ input[type="range"] {
     border-radius: 50%;
     cursor: pointer;
   }
-  
-  #obituary-form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    /* width: 50%; */
-    gap: 1em;
-    /* font-size: 1em; */
-    font-weight: 500;
-  }
-
 
 /* Obituary Preview Section */
 
 #obituary-preview {
-    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-weight: 500;
     background-color: white;
-    width: 29.7cm; /* A4 height */
-    height: 21cm; /* A4 width */
+    aspect-ratio: 297 / 210;
+    transform: scale(1.2); /* Keep the original size */
+    width: 50vw;
     overflow: hidden;
     box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
-}
-
-#preview-content {
-    /* position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0; */
-    margin: 1.6em;
-    border: 20px solid #000000;
-    font-size: 28px;
-    font-weight: 600;
-    text-align: center; /* Center the text horizontally */
-    box-sizing: border-box;
-    overflow: auto;
-    padding: 1em;
 }
 
 #preview-content {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    height: 90%; /* Ensure the container takes the full height */
+    height: 90%;
+    width: 93%;
+    margin: 4%;
+    border: 1.4vw solid #000000;
+    font-size: 1.4vw;    font-weight: 600;
+    text-align: center; /* Center the text horizontally */
+    box-sizing: border-box;
+    overflow: auto;
+    padding: 1em;
 }
 
 /* Spacer */
@@ -169,10 +226,7 @@ input[type="range"] {
     margin: 20px 0; /* Adjust margin as needed */
 }
 
-/* 
-.name-preview {
-    font-size: 20px;
-} */
+/* Name */
 
 #preview-content #first-name,
 #preview-content #last-name {
@@ -187,6 +241,8 @@ input[type="range"] {
     font-size: 1em;
     font-stretch: 80%;
 }
+
+/* Bottom section */
 
 #bottom {
     display: flex;
@@ -204,4 +260,3 @@ text-align: right;
     font-weight: 800;
 
 }
-
