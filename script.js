@@ -100,7 +100,7 @@ function updatePreview() {
     // Obituary text
     const obituaryText = `
       <div id="intro">
-        בצער רב אנו מודיעים על פטירתו של <br><span class="relation">${values['relation']}</span>
+        אנו נפרדים בצער וכאב <br><span class="relation">${values['relation']}</span>
       </div>
 
       ${namePreviewElement.outerHTML}
@@ -110,8 +110,8 @@ function updatePreview() {
       ${values['location-of-burial']}
 
       <div id="bottom">
-      <span class="shiva"> ${values.shiva.replace(/\n/g, '<br>')}</span>
-        <span class="grievers">${values['grievers']}</span>
+      <span id="shiva"> ${values.shiva.replace(/\n/g, '<br>')}</span>
+        <span id="grievers">${values['grievers']}</span>
       </div>
     </div>`;
 
@@ -126,3 +126,62 @@ function updatePreview() {
 updatePreview();
 form.addEventListener('input', updatePreview);
 textSizeSlider.addEventListener('input', updatePreview);
+
+// Export to PDF feature
+function exportToPDF() {
+  // Open a new tab
+  const newTab = window.open('', '_blank');
+
+  // Generate the HTML content for printing
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wdth,wght@62.5..100,100..900&display=swap" rel="stylesheet">
+        
+        
+        <title>Obituary Preview</title>
+        <link rel="stylesheet" href="styles.css">
+        <style>
+          @page {
+            size: A4 landscape;
+          }
+          body {
+            margin: 0;
+            padding: 4% 2% 2% 2%;
+          }
+          #preview-content {
+            margin: 0;
+            background-color: white;
+            aspect-ratio: 297 / 210;
+            zoom: 1.8; /* Adjust the zoom factor as needed */
+                    }
+        </style>
+      </head>
+      <body>
+        <div id="preview-content">
+          ${previewElement.innerHTML}
+        </div>
+      </body>
+    </html>
+  `;
+
+  // Write the HTML content to the new tab
+  newTab.document.open();
+  newTab.document.write(htmlContent);
+  newTab.document.close();
+
+  // Wait for the new tab to finish loading
+  newTab.onload = function() {
+    // Print the new tab
+    newTab.print();
+
+    // Close the new tab after printing
+    newTab.close();
+  };
+}
