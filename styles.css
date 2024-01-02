@@ -1,18 +1,23 @@
 body {
     font-family: 'Noto Sans Hebrew', sans-serif;
-    margin: 2em;
+    margin: 4em;
     direction: rtl;
-    background-color: #f8f6f3   ;
-    /* margin: 10% 4% 4% 10%; */
+    background-color: #f8f6f3;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1vw;
+    justify-content: space-around;
 }
 
-body {
+/* #main-content {
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: 10%;
+    width: 100%;
     justify-content: center;
-}
+} */
 
 h1 {
     text-align: center;
@@ -20,7 +25,14 @@ h1 {
     color: #936b51  ;
     font-stretch: 80%;
 margin: 0;
-    
+}
+
+h2 {
+    text-align: center;
+    font-size: 1.6em ;
+    color: #936b51  ;
+    font-stretch: 80%;
+margin: 0;
 }
 
 h4 {
@@ -196,7 +208,7 @@ input[type="range"] {
     font-weight: 500;
     background-color: white;
     aspect-ratio: 297 / 210;
-    transform: scale(1.2); /* Keep the original size */
+    /* transform: scale(1.2); */
     width: 50vw;
     overflow: hidden;
     box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
@@ -216,7 +228,7 @@ input[type="range"] {
     text-align: center; /* Center the text horizontally */
     box-sizing: border-box;
     overflow: auto;
-    padding: 1em;
+    padding: 1vw;
 }
 
 /* Spacer */
@@ -224,7 +236,7 @@ input[type="range"] {
     border: 0;
     height: 1px;
     background: transparent;
-    margin: 20px 0; /* Adjust margin as needed */
+    margin: 20vw 0; /* Adjust margin as needed */
 }
 
 /* Name */
@@ -233,14 +245,18 @@ input[type="range"] {
 #preview-content #last-name {
     font-weight: 900;
     font-size: 2em;
-    font-stretch: 80%;
-    line-height: 1em;
+    font-stretch: 70%;
+    line-height: 6vw;
 }
 
 #preview-content #nick-name {
     font-weight: 900;
-    font-size: 1em;
-    font-stretch: 80%;
+    font-size: 0.8em;
+    font-stretch: 70%;
+}
+
+name-preview {
+  word-spacing: 0.4rem;
 }
 
 /* Bottom section */
@@ -252,12 +268,49 @@ input[type="range"] {
     align-items: flex-end;
 }
 
-#obituary-preview span.shiva {
+span#shiva {
 text-align: right;
+line-height: 1.6vw;
 }
 
-#obituary-preview span.grievers {
+span#grievers {
     text-align: left;
     font-weight: 800;
+}
+
+ /* Buttons */
+
+button {
+  display: inline-block;
+  padding: 0.8em 1.2em;
+  background-color: #936b51;
+  color: #fff;
+  font-family: 'Noto Sans Hebrew', sans-serif;
+  font-size: 1em;
+  font-weight: bold;
+  text-decoration: none;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #655a4e;
+  transform: scale(1.1);
+  transition: transform 0.3s ease;
+}
+
+button:active {
+  background-color: #444;
+}
+
+
+.preview-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2vw;
+    box-sizing: border-box;
 
 }

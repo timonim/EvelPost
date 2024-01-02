@@ -12,7 +12,8 @@
 
 </head>
 <body>
-    
+
+        
     <form id="obituary-form">
         <h1>מודעת אבל</h1>
 
@@ -94,18 +95,23 @@
         <label for="grievers">האבלים</label>
         <textarea id="grievers" rows="3" placeholder="כתוב כאן את מקום השבעה"></textarea>
     </div>
-</div>
-
-
-    
+</div>    
     </form>
+
+    <section class="preview-section">
+
+        <h2>תצוגה מקדימה</h2>
 
     <div id="obituary-preview">
              <div id="preview-content">
               <!-- Obituary preview content here -->
              </div>
     </div>
+    
+    <button id="export-button" onclick="exportToPDF()">ייצוא לקובץ</button>
+    </section>
 
     <script src="script.js"></script>
-</body>
-</html>
+
+  </body>
+  </html>
