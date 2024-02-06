@@ -1,117 +1,149 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Obituary Generator</title>
-    <link rel="stylesheet" href="styles.css">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Obituary Generator</title>
+		<link rel="stylesheet" href="styles.css" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wdth,wght@62.5..100,100..900&display=swap"
+			rel="stylesheet"
+		/>
+	</head>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wdth,wght@62.5..100,100..900&display=swap" rel="stylesheet">
+	<body>
+		<form id="obituary-form">
+			<h1>מודעת אבל</h1>
 
-</head>
-<body>
+			<h4>פתיח</h4>
 
-        
-    <form id="obituary-form">
-        <h1>מודעת אבל</h1>
+			<div class="form-container">
+				<div class="form-field">
+					<label for="relation">קרבה</label>
+					<input type="text" id="relation" required placeholder="הזן קרבה" />
+				</div>
+			</div>
 
-        <h4>פתיח</h4>
+			<h4>שם המנוח</h4>
 
-        <div class="form-container">
-        <div class="form-field">
-        <label for="relation">קרבה</label>
-        <input type="text" id="relation" required placeholder="הזן קרבה">
-    </div>
-</div>
+			<div class="form-container">
+				<div class="fields-horz">
+					<div class="form-field">
+						<label for="first-name">שם פרטי</label>
+						<input
+							type="text"
+							id="first-name"
+							required
+							placeholder="הזן שם פרטי"
+						/>
+					</div>
 
-<h4>שם המנוח</h4>
+					<div class="form-field">
+						<label for="last-name">שם משפחה</label>
+						<input
+							type="text"
+							id="last-name"
+							required
+							placeholder="הזן שם משפחה"
+						/>
+					</div>
+				</div>
 
-<div class="form-container">
-        <div class="fields-horz">
-            <div class="form-field">
-        <label for="first-name">שם פרטי</label>
-        <input type="text" id="first-name" required placeholder="הזן שם פרטי">
-            </div>
+				<div class="form-toggle">
+					<label for="show-nick-name">הצג כינוי</label>
+					<input type="checkbox" id="show-nick-name" class="toggle-checkbox" />
+				</div>
 
-            <div class="form-field">
-                <label for="last-name">שם משפחה</label>
-                <input type="text" id="last-name" required placeholder="הזן שם משפחה">
-            </div>
-        </div>
+				<div class="form-field">
+					<label for="nick-name">כינוי</label>
+					<input type="text" id="nick-name" required placeholder="הזן כינוי" />
+				</div>
 
-        <div class="form-toggle">
-        <label for="show-nick-name">הצג כינוי</label>
-        <input type="checkbox" id="show-nick-name" class="toggle-checkbox">
-    </div>
+				<div class="form-field">
+					<label for="text-size">גודל טקסט</label>
+					<input
+						type="range"
+						id="text-size"
+						min="0.8"
+						max="4.0"
+						step="0.1"
+						value="2"
+					/>
+				</div>
+			</div>
 
-        <div class="form-field">
-        <label for="nick-name">כינוי</label>
-        <input type="text" id="nick-name" required placeholder="הזן כינוי">
-        </div>
+			<h4>הלוויה</h4>
 
-        <div class="form-field">
-        <label for="text-size">גודל טקסט</label>
-        <input type="range" id="text-size" min="0.8" max="3.6" step="0.1" value="2">        
-    </div>
-</div>
+			<div class="form-container">
+				<div class="fields-horz">
+					<div class="form-field">
+						<label for="date-of-burial">תאריך ההלוויה</label>
+						<input type="date" id="date-of-burial" required />
+					</div>
 
-<h4>הלוויה</h4>
+					<div class="form-field">
+						<label for="hour-of-burial">שעת ההלוויה</label>
+						<input type="time" id="hour-of-burial" required />
+					</div>
+				</div>
 
-<div class="form-container">
-    <div class="fields-horz">
-    <div class="form-field">
-        <label for="date-of-burial">תאריך ההלוויה</label>
-        <input type="date" id="date-of-burial" required>
-    </div>
+				<div class="form-toggle">
+					<label for="show-hebrew-date">הצג תאריך עברי</label>
+					<input
+						type="checkbox"
+						id="show-hebrew-date"
+						class="toggle-checkbox"
+					/>
+				</div>
 
-    <div class="form-field">
-        <label for="hour-of-burial">שעת ההלוויה</label>
-        <input type="time" id="hour-of-burial" required>
-    </div>
-    </div>
+				<div class="form-field">
+					<label for="location-of-burial">כתובת בית העלמין</label>
+					<input
+						type="text"
+						id="location-of-burial"
+						required
+						placeholder="הזן כתובת"
+					/>
+				</div>
+			</div>
 
-    <div class="form-toggle">
-        <label for="show-hebrew-date">הצג תאריך עברי</label>
-        <input type="checkbox" id="show-hebrew-date" class="toggle-checkbox">  
-      </div>
+			<h4>שבעה</h4>
 
-    <div class="form-field">
-        <label for="location-of-burial">כתובת בית העלמין</label>
-        <input type="text" id="location-of-burial" required placeholder="הזן כתובת">
-    </div>
-</div>
+			<div class="form-container">
+				<div class="form-field">
+					<label for="shiva">מקום השבעה</label>
+					<textarea
+						id="shiva"
+						rows="3"
+						placeholder="כתוב כאן את מקום השבעה"
+					></textarea>
+				</div>
 
-<h4>שבעה</h4>
+				<div class="form-field">
+					<label for="grievers">האבלים</label>
+					<textarea
+						id="grievers"
+						rows="3"
+						placeholder="כתוב כאן את מקום השבעה"
+					></textarea>
+				</div>
+			</div>
+		</form>
 
-<div class="form-container">
-    <div class="form-field">
-        <label for="shiva">מקום השבעה</label>
-        <textarea id="shiva" rows="3" placeholder="כתוב כאן את מקום השבעה"></textarea>
-    </div>
+		<section class="preview-section">
+			<!-- <h2>תצוגה מקדימה</h2> -->
 
-    <div class="form-field">
-        <label for="grievers">האבלים</label>
-        <textarea id="grievers" rows="3" placeholder="כתוב כאן את מקום השבעה"></textarea>
-    </div>
-</div>    
-    </form>
+			<div id="obituary-preview">
+				<div id="preview-content">
+					<!-- Obituary preview content here -->
+				</div>
+			</div>
 
-    <section class="preview-section">
+			<button id="export-button" onclick="exportToPDF()">ייצוא לקובץ</button>
+		</section>
 
-        <h2>תצוגה מקדימה</h2>
-
-    <div id="obituary-preview">
-             <div id="preview-content">
-              <!-- Obituary preview content here -->
-             </div>
-    </div>
-    
-    <button id="export-button" onclick="exportToPDF()">ייצוא לקובץ</button>
-    </section>
-
-    <script src="script.js"></script>
-
-  </body>
-  </html>
+		<script src="script.js"></script>
+	</body>
+</html>
