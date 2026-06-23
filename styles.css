@@ -1,10 +1,44 @@
 /* Normalize default styles for consistency */
 @import url("https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css");
 
+/* Design tokens
+   ----------------------------------------------------------------------- */
+:root {
+	--bg-top: #faf8f5;
+	--bg-bottom: #efe9e3;
+	--surface: #ffffff;
+	--card: #e9e2dc;
+	--card-border: #ded3ca;
+
+	--accent: #936b51;
+	--accent-strong: #7a5640;
+	--accent-soft: #ebe3dd;
+	--accent-soft-strong: #ded2c9;
+
+	--ink: #39322c;
+	--ink-muted: #635a50;
+	--field-border: #e0dad2;
+	--field-border-hover: #c4b8ab;
+
+	--radius-sm: 6px;
+	--radius-md: 10px;
+	--radius-lg: 14px;
+
+	--ring: 0 0 0 3px rgba(147, 107, 81, 0.18);
+	--shadow-card: 0 1px 2px rgba(58, 50, 43, 0.04),
+		0 6px 18px rgba(58, 50, 43, 0.06);
+	--shadow-page: 0 10px 30px rgba(58, 50, 43, 0.12);
+}
+
 body {
-	margin: 4vw;
+	margin: 0;
+	padding: 4vw;
 	direction: rtl;
-	background-color: #f8f6f3;
+	color: var(--ink);
+	background: linear-gradient(180deg, var(--bg-top), var(--bg-bottom));
+	background-attachment: fixed;
+	min-height: 100vh;
+	box-sizing: border-box;
 	display: flex;
 	flex-direction: row;
 	align-items: center;
@@ -14,39 +48,33 @@ body {
 
 @media (max-width: 1000px) {
 	body {
-		margin: 2em;
+		padding: 2em;
 		flex-direction: column;
 		justify-content: flex-start;
-		gap: 4vw;
+		gap: 2.5em;
 	}
 }
 
-/* Headline styles */
+/* Headline styles
+   ----------------------------------------------------------------------- */
 
 h1 {
 	text-align: center;
-	font-size: 400%;
-	color: #936b51;
+	font-size: clamp(2.4rem, 7vw, 3.2rem);
+	line-height: 1.05;
+	color: var(--accent);
 	font-stretch: 80%;
-	margin: 0;
+	font-weight: 800;
+	letter-spacing: 0.01em;
+	margin: 0 0 0.2em;
 }
 
 h2 {
 	text-align: center;
 	font-size: 1.6em;
-	color: #936b51;
+	color: var(--accent);
 	font-stretch: 80%;
 	margin: 0;
-}
-
-h4 {
-	text-align: right;
-	width: 100%;
-	font-size: 1.1em;
-	font-weight: bold;
-	color: #444;
-	margin: 0;
-	padding-top: 0.5em;
 }
 
 h3 {
@@ -55,7 +83,20 @@ h3 {
 	color: #666;
 }
 
-/* form column*/
+h4 {
+	display: flex;
+	align-items: center;
+	text-align: right;
+	width: 100%;
+	font-size: 1.1em;
+	font-weight: 700;
+	color: var(--ink);
+	margin: 0;
+	padding-top: 0.5em;
+}
+
+/* form column
+   ----------------------------------------------------------------------- */
 
 #obituary-form {
 	display: flex;
@@ -79,9 +120,11 @@ h3 {
 	justify-content: center;
 	align-items: center;
 	gap: 1em;
-	background-color: #ede3dc;
-	padding: 1em;
-	border-radius: 8px;
+	background-color: var(--card);
+	border: 1px solid var(--card-border);
+	padding: 1.25em;
+	border-radius: var(--radius-lg);
+	box-shadow: var(--shadow-card);
 	width: 100%;
 }
 
@@ -99,20 +142,29 @@ h3 {
 	width: 100%;
 }
 
+/* `display: flex` above overrides the `hidden` attribute's default
+   `display: none`, so restore it for fields toggled via JS. */
+.form-field[hidden] {
+	display: none;
+}
+
 .form-toggle {
 	display: flex;
 	flex-direction: row;
+	align-items: center;
 	gap: 0.6em;
 	width: 100%;
 }
 
-/* checkbox styling */
+/* checkbox styling
+   ----------------------------------------------------------------------- */
 
 .toggle-checkbox {
 	display: grid;
 	place-content: center;
-	width: 1.6em;
-	height: 1.6em;
+	width: 1.5em;
+	height: 1.5em;
+	flex: none;
 }
 
 input[type="checkbox"] {
@@ -120,9 +172,14 @@ input[type="checkbox"] {
 	-webkit-appearance: none;
 	appearance: none;
 	/* For iOS < 15 to remove gradient background */
-	background-color: #fff;
+	background-color: var(--surface);
+	border: 1px solid var(--field-border-hover);
+	border-radius: var(--radius-sm);
+	padding: 0;
 	/* Not removed via appearance */
 	margin: 0;
+	transition: border-color 0.15s ease, background-color 0.15s ease,
+		box-shadow 0.15s ease;
 }
 
 input[type="checkbox"]::before {
@@ -131,11 +188,16 @@ input[type="checkbox"]::before {
 	height: 0.65em;
 	clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
 	transform: scale(0);
-	transform-origin: bottom left;
+	transform-origin: center;
 	transition: 120ms transform ease-in-out;
 	/* Windows High Contrast Mode */
 	background-color: CanvasText;
-	box-shadow: inset 1em 1em #333;
+	box-shadow: inset 1em 1em var(--surface);
+}
+
+input[type="checkbox"]:checked {
+	background-color: var(--accent);
+	border-color: var(--accent);
 }
 
 input[type="checkbox"]:checked::before {
@@ -143,25 +205,29 @@ input[type="checkbox"]:checked::before {
 }
 
 input[type="checkbox"]:hover {
-	outline: 1px solid #777;
+	border-color: var(--accent);
 }
 
-input[type="checkbox"]:focus {
-	outline: 1px solid #936b51;
+input[type="checkbox"]:focus-visible {
+	outline: none;
+	box-shadow: var(--ring);
 }
 
-/* Text fields */
+/* Text fields
+   ----------------------------------------------------------------------- */
 
 label {
-	font-weight: bold;
-	color: #655a4e;
-	float: right;
+	font-weight: 700;
+	color: var(--ink-muted);
+	font-size: 0.92em;
 	display: flex;
 	justify-content: flex-start;
 	align-items: center;
+	cursor: pointer;
 }
 
-input {
+input,
+select {
 	width: min(100%, 100em);
 	box-sizing: border-box;
 }
@@ -173,58 +239,94 @@ textarea {
 }
 
 input,
-textarea {
+textarea,
+select {
 	font-size: 1em;
-	border: 1px solid #ddd;
-	border-radius: 4px;
-	padding: 0.8em 0.6em;
+	border: 1px solid var(--field-border);
+	border-radius: var(--radius-sm);
+	padding: 0.7em 0.65em;
+	background-color: var(--surface);
+	color: var(--ink);
+	transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-input:hover,
-textarea:hover {
-	outline: 1px solid #777;
+input::placeholder,
+textarea::placeholder {
+	color: #b3a89c;
 }
 
-input:focus,
-textarea:focus {
-	outline: 1px solid #936b51;
-}
-
-/* slider */
-
-input[type="range"] {
-	/* width: 100%; */
-	margin: 10px 0;
-	background-color: #eee;
-	accent-color: #b47553;
-	height: 5px;
-	border-radius: 5px;
+select {
 	cursor: pointer;
 }
 
-input[type="range"]::-webkit-slider-thumb {
-	-webkit-appearance: none;
-	background-color: #333;
-	width: 1em;
-	height: 1em;
-	border-radius: 50%;
+input:hover,
+textarea:hover,
+select:hover {
+	border-color: var(--field-border-hover);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+	outline: none;
+	border-color: var(--accent);
+	box-shadow: var(--ring);
+}
+
+/* slider
+   ----------------------------------------------------------------------- */
+
+input[type="range"] {
+	margin: 0.6em 0;
+	padding: 0;
+	background-color: var(--accent-soft-strong);
+	accent-color: var(--accent);
+	height: 6px;
+	border: none;
+	border-radius: 999px;
 	cursor: pointer;
 }
 
 input[type="range"]:hover {
-	outline: 0;
+	border-color: transparent;
 }
 
-/* Obituary Preview Section */
+input[type="range"]::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	background-color: var(--accent);
+	border: 2px solid var(--surface);
+	box-shadow: 0 1px 3px rgba(58, 50, 43, 0.3);
+	width: 1.1em;
+	height: 1.1em;
+	border-radius: 50%;
+	cursor: pointer;
+}
+
+input[type="range"]::-moz-range-thumb {
+	background-color: var(--accent);
+	border: 2px solid var(--surface);
+	box-shadow: 0 1px 3px rgba(58, 50, 43, 0.3);
+	width: 1.1em;
+	height: 1.1em;
+	border-radius: 50%;
+	cursor: pointer;
+}
+
+input[type="range"]:focus-visible {
+	outline: none;
+	box-shadow: var(--ring);
+}
+
+/* Obituary Preview Section
+   ----------------------------------------------------------------------- */
 
 .preview-section {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: 1em;
+	gap: 1.25em;
 	box-sizing: border-box;
 	width: 50%;
-	/* max-width: 60em; */
 }
 
 #obituary-preview {
@@ -233,14 +335,18 @@ input[type="range"]:hover {
 	align-items: center;
 	justify-content: center;
 	font-weight: 500;
-	background-color: white;
+	background-color: var(--surface);
 	aspect-ratio: 297 / 210;
-	/* width: clamp(1em, 54vw, 60em); */
 	overflow: hidden;
-	box-shadow: 0.2em 0.2em 4px rgba(0, 0, 0, 0.2);
+	border-radius: 2px;
+	box-shadow: var(--shadow-page);
 	box-sizing: border-box;
-  	position: relative;
+	position: relative;
 	width: 100%;
+	/* Make this the sizing reference: everything inside is measured in cqw
+	   (% of this box's width), so the layout is identical at any size —
+	   including the exact A4 box used for PDF export. */
+	container-type: inline-size;
 }
 
 /* Mobile */
@@ -255,7 +361,7 @@ input[type="range"]:hover {
 @media (max-width: 1000px) {
 	#obituary-preview {
 		zoom: 1.8;
-		box-shadow: 0.1em 0.1em 2px rgba(0, 0, 0, 0.2);
+		box-shadow: 0 4px 14px rgba(58, 50, 43, 0.15);
 	}
 }
 
@@ -263,18 +369,19 @@ input[type="range"]:hover {
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
-	width: calc(100% - 8%); 
+	width: calc(100% - 8%);
 	flex: auto;
-	margin: clamp(0.6em, 4%, 2em);
-	border: clamp(0.6em, 1.4vw, 1em) solid #000000;
-	font-size: clamp(0.2em, 1.2vw, 20em);
+	margin: 4%;
+	border: 0.6em solid #000000;
+	color: #000;
+	font-size: 3.5cqw;
 	font-weight: 600;
 	font-stretch: 80%;
 	text-align: center;
 	/* Center the text horizontally */
 	box-sizing: border-box;
-	overflow: auto;
-	padding: clamp(0.2em, 1vw, 0.5em);
+	overflow: hidden;
+	padding: 0.5em;
 }
 
 /* Spacer */
@@ -288,23 +395,27 @@ input[type="range"]:hover {
 
 /* Name */
 
-#preview-content #first-name,
-#preview-content #last-name {
+#preview-content .preview-first-name,
+#preview-content .preview-last-name {
 	font-weight: 900;
 	font-size: 1.8em;
 	font-stretch: 70%;
 	line-height: 100%;
 }
 
-#preview-content #nick-name {
+#preview-content .preview-nick-name {
 	font-weight: 900;
 	font-size: 0.8em;
 	font-stretch: 70%;
 }
 
+#preview-content .preview-title {
+	font-size: 0.5em;
+}
+
 name-preview {
-	letter-spacing: -0.1vw;
-	word-spacing: 0.3vw;
+	letter-spacing: -0.1cqw;
+	word-spacing: 0.3cqw;
 }
 
 /* Bottom section */
@@ -317,42 +428,77 @@ name-preview {
 	gap: 20%;
 }
 
-span#shiva {
+.preview-shiva {
 	text-align: right;
 	line-height: 110%;
 	max-width: 30%;
 }
 
-span#grievers {
+.preview-grievers {
 	text-align: left;
 	line-height: 110%;
 	font-weight: 800;
 	max-width: 30%;
 }
 
-/* Buttons */
+/* Buttons
+   ----------------------------------------------------------------------- */
+
+.actions {
+	display: flex;
+	flex-direction: row;
+	gap: 1em;
+	flex-wrap: wrap;
+	justify-content: center;
+}
 
 button {
 	display: inline-block;
-	padding: 0.8em 1.2em;
-	background-color: #936b51;
+	padding: 0.8em 1.4em;
+	background-color: var(--accent);
 	color: #fff;
 	font-size: 1em;
-	font-weight: bold;
+	font-weight: 700;
 	text-decoration: none;
-	border-radius: 4px;
+	border-radius: var(--radius-sm);
 	border: none;
 	cursor: pointer;
-	transition: background-color 0.3s ease;
+	box-shadow: 0 1px 2px rgba(58, 50, 43, 0.18);
+	transition: background-color 0.2s ease, transform 0.1s ease,
+		box-shadow 0.2s ease;
 }
 
 button:hover {
-	background-color: #655a4e;
-	transition: transform 0.1s ease;
+	background-color: var(--accent-strong);
+	transform: translateY(-1px);
+	box-shadow: 0 4px 12px rgba(58, 50, 43, 0.2);
 }
 
 button:active {
-	background-color: #444;
+	background-color: var(--accent-strong);
+	transform: translateY(0);
+	box-shadow: 0 1px 2px rgba(58, 50, 43, 0.18);
+}
+
+button:focus-visible {
+	outline: none;
+	box-shadow: var(--ring);
+}
+
+.button-secondary {
+	background-color: transparent;
+	color: var(--accent);
+	border: 1px solid var(--accent);
+	box-shadow: none;
+}
+
+.button-secondary:hover {
+	background-color: var(--accent-soft);
+	box-shadow: none;
+}
+
+.button-secondary:active {
+	background-color: var(--accent-soft-strong);
 }
 
 /* Reset default styles */
