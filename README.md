@@ -1,26 +1,34 @@
 # EvelPost — מחולל מודעות אבל
 
-A small, dependency-free web app for composing a Hebrew memorial/obituary
-notice (מודעת אבל) and exporting it to a print-ready PDF.
+A small, dependency-free web app for composing a Hebrew memorial notice
+(מודעת אבל) and printing it or sharing it as an image.
 
-You fill in a form on the right‑to‑left side panel — relation, the deceased's
-name and optional nickname, burial date/time and location, the shiva details
-and the mourners — and a live, framed preview updates as you type. When you're
-happy with it, **ייצוא לקובץ** opens a print dialog laid out for A4 landscape.
+There is no form to fill in. The notice itself is the interface: tap any part
+of it (the opening, the name, the funeral, the shiva, the mourners) and a short,
+plainly worded step opens for just that part. Parts you haven't filled yet
+show a faded example in place, and "הבא" walks you through the steps in order
+if you want guidance.
 
 ## Features
 
-- **Live preview** that mirrors every change instantly.
-- **Optional nickname** and **Hebrew (Jewish-calendar) date**, toggled on/off.
-- **Adjustable name size** via a slider.
-- **PDF export** through the browser's native print dialog (A4 landscape).
-- **Automatic draft saving** to `localStorage` — your entries survive a reload.
-- **Reset** to clear the form and the saved draft.
+- **Edit on the notice**: click or tap a region to edit it; a six-step guide
+  (פתיח, שם, הלוויה, שבעה, אבלים, סיום) is there for anyone who wants it.
+- **Inclusive wording**: הוא / היא (פטירתו / פטירתה), a choice of honorific
+  (ז״ל, ע״ה, זצ״ל, הי״ד or none), and the type of ceremony (הלוויה, הלוויה
+  אזרחית, טקס פרידה). Optional title, nickname and Hebrew date.
+- **Always fits**: text shrinks automatically so nothing is ever cut off;
+  long names shrink on their own; the shiva and mourner lines break only where
+  you broke them.
+- **Clean output**: unfilled examples, and lines left incomplete without them,
+  never reach the printout or image.
+- **Print / PDF** (A4, landscape or portrait) and **save as image** (PNG; on
+  phones this opens the share sheet, e.g. for WhatsApp).
+- **Thin-frame option** that saves ink on home printers.
+- **Automatic draft saving** to `localStorage`; your entries survive a reload.
 
 ## Running it
 
-There's no build step. Either open `index.html` directly in a browser, or
-serve the folder so font/CDN requests behave consistently:
+There's no build step. Serve the folder and open it in a browser:
 
 ```sh
 python3 -m http.server 8000
@@ -29,17 +37,18 @@ python3 -m http.server 8000
 
 ## Files
 
-| File         | Purpose                                              |
-| ------------ | ---------------------------------------------------- |
-| `index.html` | Markup: the input form and the preview/export panel. |
-| `styles.css` | Layout, RTL styling, and the framed-notice preview.  |
-| `script.js`  | Live preview, draft persistence, and PDF export.     |
+| File                     | Purpose                                                 |
+| ------------------------ | ------------------------------------------------------- |
+| `index.html`             | The notice (with its editable regions) and the steps.   |
+| `styles.css`             | Layout, the notice, and the print stylesheet.           |
+| `script.js`              | Rendering, auto-fit, steps, drafts, print and image.   |
+| `fonts/`                 | Self-hosted Noto Sans Hebrew (SIL OFL, see `OFL.txt`).  |
+| `vendor/html-to-image.js`| html-to-image 1.11.11 (MIT), loaded only for images.    |
 
 ## Notes
 
-- Hebrew dates use the browser's `Intl` Hebrew calendar
-  (`he-IL-u-ca-hebrew`).
-- The preview text is built from user input that is HTML-escaped before
-  rendering.
-- Fonts come from Google Fonts (`Noto Sans Hebrew`) and `normalize.css` from a
-  CDN, so the page expects network access on first load.
+- Everything inside the notice is sized relative to its width (`cqw`/`em`), so
+  the layout is identical on screen, on A4 paper and in the exported image.
+- Hebrew dates use the browser's `Intl` Hebrew calendar.
+- User input is HTML-escaped before rendering.
+- No network requests besides the page's own files.

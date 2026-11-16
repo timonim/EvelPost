@@ -1,5 +1,25 @@
-/* Normalize default styles for consistency */
-@import url("https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css");
+/* Fonts (self-hosted Noto Sans Hebrew variable font, SIL OFL 1.1)
+   ----------------------------------------------------------------------- */
+@font-face {
+	font-family: "Noto Sans Hebrew";
+	src: url("fonts/noto-sans-hebrew-hebrew.woff2") format("woff2");
+	font-weight: 100 900;
+	font-stretch: 62.5% 100%;
+	font-display: swap;
+	unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC,
+		U+FB1D-FB4F;
+}
+
+@font-face {
+	font-family: "Noto Sans Hebrew";
+	src: url("fonts/noto-sans-hebrew-latin.woff2") format("woff2");
+	font-weight: 100 900;
+	font-stretch: 62.5% 100%;
+	font-display: swap;
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+		U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122,
+		U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
 
 /* Design tokens
    ----------------------------------------------------------------------- */
@@ -17,242 +37,472 @@
 
 	--ink: #39322c;
 	--ink-muted: #635a50;
-	--field-border: #e0dad2;
-	--field-border-hover: #c4b8ab;
+	--placeholder: #857869;
+	--field-border: #d8d0c6;
+	--field-border-hover: #b9ab9c;
 
 	--radius-sm: 6px;
 	--radius-md: 10px;
 	--radius-lg: 14px;
 
-	--ring: 0 0 0 3px rgba(147, 107, 81, 0.18);
+	--ring: 0 0 0 3px rgba(147, 107, 81, 0.25);
 	--shadow-card: 0 1px 2px rgba(58, 50, 43, 0.04),
 		0 6px 18px rgba(58, 50, 43, 0.06);
 	--shadow-page: 0 10px 30px rgba(58, 50, 43, 0.12);
 }
 
+/* Base
+   ----------------------------------------------------------------------- */
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+	min-width: 0;
+}
+
+[hidden] {
+	display: none !important;
+}
+
+html {
+	font-family: "Noto Sans Hebrew", sans-serif;
+	-webkit-text-size-adjust: 100%;
+}
+
 body {
 	margin: 0;
-	padding: 4vw;
-	direction: rtl;
+	padding: clamp(1rem, 3vw, 2.5rem);
 	color: var(--ink);
 	background: linear-gradient(180deg, var(--bg-top), var(--bg-bottom));
 	background-attachment: fixed;
 	min-height: 100vh;
-	box-sizing: border-box;
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	gap: 4vw;
-	justify-content: center;
 }
 
-@media (max-width: 1000px) {
-	body {
-		padding: 2em;
-		flex-direction: column;
-		justify-content: flex-start;
-		gap: 2.5em;
-	}
+button,
+input,
+select,
+textarea {
+	font: inherit;
+	color: inherit;
 }
 
-/* Headline styles
+/* Header
    ----------------------------------------------------------------------- */
 
-h1 {
+.app-header {
+	max-width: 80rem;
+	margin: 0 auto clamp(1rem, 3vw, 2rem);
 	text-align: center;
-	font-size: clamp(2.4rem, 7vw, 3.2rem);
+}
+
+h1 {
+	font-size: clamp(2rem, 6vw, 3rem);
 	line-height: 1.05;
 	color: var(--accent);
 	font-stretch: 80%;
 	font-weight: 800;
-	letter-spacing: 0.01em;
-	margin: 0 0 0.2em;
+	margin: 0 0 0.25em;
 }
 
-h2 {
-	text-align: center;
-	font-size: 1.6em;
-	color: var(--accent);
-	font-stretch: 80%;
+.tagline {
 	margin: 0;
-}
-
-h3 {
-	text-align: center;
-	font-size: 1.4em;
-	color: #666;
-}
-
-h4 {
-	display: flex;
-	align-items: center;
-	text-align: right;
-	width: 100%;
-	font-size: 1.1em;
-	font-weight: 700;
-	color: var(--ink);
-	margin: 0;
-	padding-top: 0.5em;
-}
-
-/* form column
-   ----------------------------------------------------------------------- */
-
-#obituary-form {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	width: min(100%, 30em);
-	gap: 1em;
+	color: var(--ink-muted);
 	font-weight: 500;
 }
 
+/* Workspace: editor beside the notice (stacked on narrow screens)
+   ----------------------------------------------------------------------- */
+
+.workspace {
+	display: grid;
+	grid-template-columns: minmax(20rem, 26rem) minmax(0, 1fr);
+	grid-template-areas: "editor stage";
+	align-items: start;
+	gap: clamp(1.5rem, 4vw, 3.5rem);
+	max-width: 80rem;
+	margin: 0 auto;
+}
+
+.stage {
+	grid-area: stage;
+	position: sticky;
+	top: clamp(1rem, 3vw, 2.5rem);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 1.25rem;
+}
+
+.editor {
+	grid-area: editor;
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+	background-color: var(--card);
+	border: 1px solid var(--card-border);
+	border-radius: var(--radius-lg);
+	box-shadow: var(--shadow-card);
+	padding: 1.25rem;
+	scroll-margin-top: var(--stage-height, 0px);
+}
+
 @media (max-width: 1000px) {
-	#obituary-form {
-		width: min(100%, 100%);
+	.workspace {
+		grid-template-columns: minmax(0, 1fr);
+		grid-template-areas: "stage" "editor";
+		gap: 1rem;
+	}
+
+	/* Keep the notice in view above the fields while typing. */
+	.stage {
+		top: 0;
+		z-index: 2;
+		margin: 0 calc(-1 * clamp(1rem, 3vw, 2.5rem));
+		padding: 0.75rem clamp(1rem, 3vw, 2.5rem);
+		background: var(--bg-top);
+		box-shadow: 0 6px 12px -8px rgba(58, 50, 43, 0.25);
+	}
+
+	.stage .stage-actions {
+		display: none;
+	}
+
+	.app-header {
+		margin-bottom: 0.5rem;
+	}
+
+	.tagline {
+		font-size: 0.9rem;
 	}
 }
 
-.form-container {
-	box-sizing: border-box;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-	gap: 1em;
-	background-color: var(--card);
-	border: 1px solid var(--card-border);
-	padding: 1.25em;
-	border-radius: var(--radius-lg);
-	box-shadow: var(--shadow-card);
-	width: 100%;
-}
-
-.fields-horz {
-	display: flex;
-	flex-direction: row;
-	gap: 1em;
-	width: 100%;
-}
-
-.form-field {
-	display: flex;
-	flex-direction: column;
-	gap: 0.4em;
-	width: 100%;
-}
-
-/* `display: flex` above overrides the `hidden` attribute's default
-   `display: none`, so restore it for fields toggled via JS. */
-.form-field[hidden] {
-	display: none;
-}
-
-.form-toggle {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	gap: 0.6em;
-	width: 100%;
-}
-
-/* checkbox styling
+/* The notice
    ----------------------------------------------------------------------- */
 
-.toggle-checkbox {
-	display: grid;
-	place-content: center;
-	width: 1.5em;
-	height: 1.5em;
-	flex: none;
+.notice {
+	--aspect: 297 / 210;
+	--max-height: 72vh;
+	position: relative;
+	width: min(100%, calc(var(--max-height) * 297 / 210));
+	aspect-ratio: var(--aspect);
+	background-color: #fff;
+	border-radius: 2px;
+	box-shadow: var(--shadow-page);
+	/* Everything inside is measured in cqw (% of this box's width), so the
+	   layout is identical at any size: on screen, on A4 and as an image. */
+	container-type: inline-size;
 }
 
-input[type="checkbox"] {
-	/* Add if not using autoprefixer */
-	-webkit-appearance: none;
-	appearance: none;
-	/* For iOS < 15 to remove gradient background */
-	background-color: var(--surface);
-	border: 1px solid var(--field-border-hover);
-	border-radius: var(--radius-sm);
-	padding: 0;
-	/* Not removed via appearance */
+.notice[data-orientation="portrait"] {
+	--aspect: 210 / 297;
+	width: min(100%, calc(var(--max-height) * 210 / 297));
+}
+
+@media (max-width: 1000px) {
+	.notice {
+		--max-height: 38vh;
+		--max-height: 38svh;
+	}
+}
+
+.notice-frame {
+	position: absolute;
+	inset: 4cqw;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	gap: 0.3em;
+	padding: 0.5em 0.8em;
+	border: 1.8cqw solid #000;
+	color: #000;
+	font-size: 3.6cqw; /* overwritten by the auto-fit in script.js */
+	font-weight: 600;
+	font-stretch: 80%;
+	line-height: 1.25;
+	text-align: center;
+	overflow: hidden;
+}
+
+.notice[data-orientation="portrait"] .notice-frame {
+	inset: 5cqw;
+	padding: 1em 0.8em;
+}
+
+.notice[data-frame="thin"] .notice-frame {
+	border-width: 0.45cqw;
+}
+
+.notice p {
 	margin: 0;
-	transition: border-color 0.15s ease, background-color 0.15s ease,
-		box-shadow 0.15s ease;
 }
 
-input[type="checkbox"]::before {
-	content: "";
-	width: 0.65em;
-	height: 0.65em;
-	clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
-	transform: scale(0);
-	transform-origin: center;
-	transition: 120ms transform ease-in-out;
-	/* Windows High Contrast Mode */
-	background-color: CanvasText;
-	box-shadow: inset 1em 1em var(--surface);
+/* Editable regions */
+
+.region {
+	flex-shrink: 0;
+	border-radius: 0.2em;
+	cursor: pointer;
+	outline: 0.08em dashed transparent;
+	outline-offset: 0.05em;
+	transition: background-color 0.15s ease, outline-color 0.15s ease;
 }
 
-input[type="checkbox"]:checked {
+.region:hover {
+	background-color: rgba(147, 107, 81, 0.07);
+	outline-color: rgba(147, 107, 81, 0.45);
+}
+
+.region.is-active {
+	background-color: rgba(147, 107, 81, 0.1);
+	outline-color: var(--accent);
+}
+
+.region:focus-visible {
+	outline: 0.12em solid var(--accent);
+}
+
+.ghost {
+	color: #b4aaa0;
+}
+
+.notice-opening {
+	font-size: 1.05em;
+}
+
+/* Name */
+
+.notice-name {
+	font-weight: 900;
+	font-stretch: 70%;
+	line-height: 1;
+	letter-spacing: -0.03em;
+}
+
+.name-part {
+	font-size: 1.8em;
+	white-space: nowrap;
+}
+
+.name-nick {
+	font-size: 0.8em;
+	white-space: nowrap;
+}
+
+.name-title {
+	font-size: 0.5em;
+	letter-spacing: 0;
+}
+
+/* Inside .name-part (1.8em), so this is half the base name size. */
+.name-honorific {
+	font-size: 0.28em;
+	letter-spacing: 0;
+}
+
+/* Shiva and mourners, side by side at the bottom */
+
+/* Columns take their natural width so lines break only where the user
+   broke them; the auto-fit shrinks the text if they don't fit side by side. */
+.notice-bottom {
+	display: grid;
+	grid-template-columns: max-content max-content;
+	justify-content: space-between;
+	align-items: end;
+	column-gap: 1.5em;
+	flex-shrink: 0;
+}
+
+/* Both blocks read right-to-left; the mourners hug the left edge. */
+.region-shiva,
+.region-mourners {
+	text-align: right;
+	line-height: 1.15;
+}
+
+.region-mourners {
+	justify-self: end;
+	font-weight: 800;
+}
+
+/* Portrait is too narrow for two columns: stack them, centred. */
+.notice[data-orientation="portrait"] .notice-bottom {
+	grid-template-columns: max-content;
+	justify-content: center;
+	row-gap: 0.8em;
+}
+
+.notice[data-orientation="portrait"] .region-shiva,
+.notice[data-orientation="portrait"] .region-mourners {
+	justify-self: center;
+	text-align: center;
+}
+
+/* Times, dates and phone numbers never break mid-way. */
+.nowrap {
+	white-space: nowrap;
+}
+
+/* Clean copy rendered for image export */
+
+.export-holder {
+	position: fixed;
+	top: 0;
+	left: -100000px;
+}
+
+.notice.is-export {
+	--max-height: none;
+	max-width: none;
+	box-shadow: none;
+	border-radius: 0;
+}
+
+.notice.is-export .region {
+	background: none;
+	outline: none;
+}
+
+/* Editor
+   ----------------------------------------------------------------------- */
+
+.step-tabs {
+	display: flex;
+	gap: 0.35rem;
+	overflow-x: auto;
+	scrollbar-width: none;
+	margin: -0.25rem -0.25rem 0;
+	padding: 0.25rem;
+}
+
+.step-tab {
+	flex: 1 1 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 0.25em;
+	padding: 0.45em 0.15em;
+	border: none;
+	border-radius: var(--radius-md);
+	background: transparent;
+	color: var(--ink-muted);
+	font-size: 0.8rem;
+	font-weight: 600;
+	white-space: nowrap;
+	cursor: pointer;
+	box-shadow: none;
+}
+
+.step-num {
+	display: inline-grid;
+	place-content: center;
+	width: 1.8em;
+	height: 1.8em;
+	border-radius: 50%;
+	border: 1px solid var(--field-border-hover);
+	font-size: 0.95em;
+	line-height: 1;
+}
+
+.step-tab:hover {
+	background-color: var(--accent-soft);
+	transform: none;
+	box-shadow: none;
+}
+
+.step-tab.is-done .step-num {
+	background-color: var(--accent-soft-strong);
+	border-color: var(--accent-soft-strong);
+	color: var(--accent-strong);
+}
+
+.step-tab[aria-current="step"] {
+	background-color: var(--surface);
+	color: var(--ink);
+	box-shadow: 0 1px 2px rgba(58, 50, 43, 0.12);
+}
+
+.step-tab[aria-current="step"] .step-num {
 	background-color: var(--accent);
 	border-color: var(--accent);
+	color: #fff;
 }
 
-input[type="checkbox"]:checked::before {
-	transform: scale(1);
+.step {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
 }
 
-input[type="checkbox"]:hover {
-	border-color: var(--accent);
+.step h2 {
+	margin: 0.25rem 0 0;
+	font-size: 1.45rem;
+	font-weight: 800;
+	font-stretch: 85%;
+	color: var(--ink);
 }
 
-input[type="checkbox"]:focus-visible {
-	outline: none;
-	box-shadow: var(--ring);
+.hint {
+	margin: -0.6rem 0 0;
+	color: var(--ink-muted);
+	font-size: 0.95rem;
 }
 
-/* Text fields
-   ----------------------------------------------------------------------- */
+.hint.small {
+	margin: 0;
+	font-size: 0.85rem;
+}
 
-label {
+.field {
+	display: flex;
+	flex-direction: column;
+	gap: 0.35em;
+}
+
+.fields-row {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 0.75rem;
+}
+
+label,
+legend {
 	font-weight: 700;
 	color: var(--ink-muted);
-	font-size: 0.92em;
-	display: flex;
-	justify-content: flex-start;
-	align-items: center;
-	cursor: pointer;
+	font-size: 0.92rem;
 }
 
-input,
-select {
-	width: min(100%, 100em);
-	box-sizing: border-box;
-}
-
-textarea {
-	display: block;
-	height: 3em;
-	resize: none;
-}
-
-input,
+input[type="text"],
+input[type="date"],
+input[type="time"],
 textarea,
 select {
-	font-size: 1em;
+	width: 100%;
+	font-size: 1rem;
 	border: 1px solid var(--field-border);
 	border-radius: var(--radius-sm);
-	padding: 0.7em 0.65em;
+	padding: 0.65em 0.7em;
 	background-color: var(--surface);
 	color: var(--ink);
 	transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
+input[type="date"],
+input[type="time"] {
+	min-height: 2.9em;
+}
+
+textarea {
+	resize: vertical;
+	line-height: 1.4;
+	field-sizing: content;
+	min-height: 5.5em;
+}
+
 input::placeholder,
 textarea::placeholder {
-	color: #b3a89c;
+	color: var(--placeholder);
 }
 
 select {
@@ -273,172 +523,141 @@ select:focus {
 	box-shadow: var(--ring);
 }
 
-/* slider
-   ----------------------------------------------------------------------- */
+/* Chips: radio choices that read like options, not form controls */
 
-input[type="range"] {
-	margin: 0.6em 0;
+.choice {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4rem;
+	margin: 0;
 	padding: 0;
-	background-color: var(--accent-soft-strong);
-	accent-color: var(--accent);
-	height: 6px;
 	border: none;
+}
+
+.choice legend {
+	padding: 0;
+	margin-bottom: 0.4rem;
+}
+
+.chip {
+	position: relative;
+	cursor: pointer;
+}
+
+.chip input {
+	position: absolute;
+	opacity: 0;
+	inset: 0;
+	margin: 0;
+	cursor: pointer;
+}
+
+.chip span {
+	display: inline-block;
+	padding: 0.4em 0.9em;
+	border: 1px solid var(--field-border);
 	border-radius: 999px;
+	background-color: var(--surface);
+	color: var(--ink);
+	font-weight: 600;
+	font-size: 0.95rem;
+	transition: background-color 0.15s ease, border-color 0.15s ease,
+		color 0.15s ease;
+}
+
+.chip:hover span {
+	border-color: var(--accent);
+}
+
+.chip input:checked + span {
+	background-color: var(--accent);
+	border-color: var(--accent);
+	color: #fff;
+}
+
+.chip input:focus-visible + span {
+	box-shadow: var(--ring);
+}
+
+/* Toggles: small switches for optional extras */
+
+.toggles {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem 1.25rem;
+}
+
+.toggle {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5em;
 	cursor: pointer;
+	color: var(--ink);
+	font-weight: 600;
 }
 
-input[type="range"]:hover {
-	border-color: transparent;
-}
-
-input[type="range"]::-webkit-slider-thumb {
+.toggle input {
+	appearance: none;
 	-webkit-appearance: none;
-	background-color: var(--accent);
-	border: 2px solid var(--surface);
-	box-shadow: 0 1px 3px rgba(58, 50, 43, 0.3);
-	width: 1.1em;
-	height: 1.1em;
-	border-radius: 50%;
+	position: relative;
+	flex: none;
+	width: 2.4em;
+	height: 1.4em;
+	margin: 0;
+	border-radius: 999px;
+	background-color: var(--field-border-hover);
 	cursor: pointer;
+	transition: background-color 0.15s ease;
 }
 
-input[type="range"]::-moz-range-thumb {
-	background-color: var(--accent);
-	border: 2px solid var(--surface);
-	box-shadow: 0 1px 3px rgba(58, 50, 43, 0.3);
-	width: 1.1em;
-	height: 1.1em;
+.toggle input::before {
+	content: "";
+	position: absolute;
+	top: 0.2em;
+	right: 0.2em;
+	width: 1em;
+	height: 1em;
 	border-radius: 50%;
-	cursor: pointer;
+	background-color: #fff;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+	transition: transform 0.15s ease;
 }
 
-input[type="range"]:focus-visible {
+.toggle input:checked {
+	background-color: var(--accent);
+}
+
+.toggle input:checked::before {
+	transform: translateX(-1em);
+}
+
+.toggle input:focus-visible {
 	outline: none;
 	box-shadow: var(--ring);
 }
 
-/* Obituary Preview Section
-   ----------------------------------------------------------------------- */
+/* Slider */
 
-.preview-section {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 1.25em;
-	box-sizing: border-box;
-	width: 50%;
-}
-
-#obituary-preview {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	font-weight: 500;
-	background-color: var(--surface);
-	aspect-ratio: 297 / 210;
-	overflow: hidden;
-	border-radius: 2px;
-	box-shadow: var(--shadow-page);
-	box-sizing: border-box;
-	position: relative;
+input[type="range"] {
 	width: 100%;
-	/* Make this the sizing reference: everything inside is measured in cqw
-	   (% of this box's width), so the layout is identical at any size —
-	   including the exact A4 box used for PDF export. */
-	container-type: inline-size;
+	margin: 0.4em 0;
+	accent-color: var(--accent);
+	cursor: pointer;
 }
 
-/* Mobile */
+/* Step navigation */
 
-@media (max-width: 1000px) {
-	#obituary-preview,
-	.preview-section {
-		width: 100%;
-	}
-}
-
-@media (max-width: 1000px) {
-	#obituary-preview {
-		zoom: 1.8;
-		box-shadow: 0 4px 14px rgba(58, 50, 43, 0.15);
-	}
-}
-
-#preview-content {
+.step-nav {
 	display: flex;
-	flex-direction: column;
 	justify-content: space-between;
-	width: calc(100% - 8%);
-	flex: auto;
-	margin: 4%;
-	border: 0.6em solid #000000;
-	color: #000;
-	font-size: 3.5cqw;
-	font-weight: 600;
-	font-stretch: 80%;
-	text-align: center;
-	/* Center the text horizontally */
-	box-sizing: border-box;
-	overflow: hidden;
-	padding: 0.5em;
+	gap: 0.75rem;
+	padding-top: 0.25rem;
+	border-top: 1px solid var(--card-border);
+	padding-top: 1rem;
 }
 
-/* Spacer */
-
-#preview-content hr {
-	border: 0;
-	height: 1px;
-	background: transparent;
-	margin: 20vw 0;
-}
-
-/* Name */
-
-#preview-content .preview-first-name,
-#preview-content .preview-last-name {
-	font-weight: 900;
-	font-size: 1.8em;
-	font-stretch: 70%;
-	line-height: 100%;
-}
-
-#preview-content .preview-nick-name {
-	font-weight: 900;
-	font-size: 0.8em;
-	font-stretch: 70%;
-}
-
-#preview-content .preview-title {
-	font-size: 0.5em;
-}
-
-name-preview {
-	letter-spacing: -0.1cqw;
-	word-spacing: 0.3cqw;
-}
-
-/* Bottom section */
-
-#bottom {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-around;
-	align-items: flex-end;
-	gap: 20%;
-}
-
-.preview-shiva {
-	text-align: right;
-	line-height: 110%;
-	max-width: 30%;
-}
-
-.preview-grievers {
-	text-align: left;
-	line-height: 110%;
-	font-weight: 800;
-	max-width: 30%;
+.step-nav #next-step {
+	margin-inline-start: auto;
 }
 
 /* Buttons
@@ -446,22 +665,24 @@ name-preview {
 
 .actions {
 	display: flex;
-	flex-direction: row;
-	gap: 1em;
+	gap: 0.75rem;
 	flex-wrap: wrap;
 	justify-content: center;
 }
 
+.step .actions {
+	justify-content: flex-start;
+}
+
 button {
 	display: inline-block;
-	padding: 0.8em 1.4em;
+	padding: 0.75em 1.3em;
 	background-color: var(--accent);
 	color: #fff;
-	font-size: 1em;
+	font-size: 1rem;
 	font-weight: 700;
-	text-decoration: none;
 	border-radius: var(--radius-sm);
-	border: none;
+	border: 1px solid var(--accent);
 	cursor: pointer;
 	box-shadow: 0 1px 2px rgba(58, 50, 43, 0.18);
 	transition: background-color 0.2s ease, transform 0.1s ease,
@@ -475,9 +696,7 @@ button:hover {
 }
 
 button:active {
-	background-color: var(--accent-strong);
 	transform: translateY(0);
-	box-shadow: 0 1px 2px rgba(58, 50, 43, 0.18);
 }
 
 button:focus-visible {
@@ -487,8 +706,7 @@ button:focus-visible {
 
 .button-secondary {
 	background-color: transparent;
-	color: var(--accent);
-	border: 1px solid var(--accent);
+	color: var(--accent-strong);
 	box-shadow: none;
 }
 
@@ -497,13 +715,101 @@ button:focus-visible {
 	box-shadow: none;
 }
 
-.button-secondary:active {
-	background-color: var(--accent-soft-strong);
+.link-button {
+	align-self: flex-start;
+	padding: 0.25em 0;
+	border: none;
+	background: none;
+	box-shadow: none;
+	color: var(--ink-muted);
+	font-weight: 600;
+	text-decoration: underline;
+	text-underline-offset: 0.2em;
 }
 
-/* Reset default styles */
+.link-button:hover {
+	background: none;
+	box-shadow: none;
+	transform: none;
+	color: var(--ink);
+}
 
-* {
-	font-family: "Noto Sans Hebrew", sans-serif;
-	min-width: 0;
+/* Status toast */
+
+.status {
+	position: fixed;
+	bottom: 1.25rem;
+	left: 50%;
+	z-index: 10;
+	margin: 0;
+	padding: 0.7em 1.2em;
+	border-radius: var(--radius-md);
+	background-color: var(--ink);
+	color: #fff;
+	font-weight: 600;
+	box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+	transform: translate(-50%, 1rem);
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.status.is-visible {
+	opacity: 1;
+	transform: translate(-50%, 0);
+}
+
+/* Print: only the notice, filling the A4 page
+   ----------------------------------------------------------------------- */
+
+@media print {
+	html,
+	body {
+		margin: 0;
+		padding: 0;
+		min-height: 0;
+		background: #fff;
+	}
+
+	.app-header,
+	.editor,
+	.actions,
+	.status {
+		display: none !important;
+	}
+
+	.workspace,
+	.stage {
+		display: block;
+		position: static;
+		margin: 0;
+		padding: 0;
+		box-shadow: none;
+		background: none;
+	}
+
+	/* A hair under A4 so rounding never spills onto a second page. */
+	.notice {
+		width: 296mm;
+		box-shadow: none;
+		border-radius: 0;
+		print-color-adjust: exact;
+		-webkit-print-color-adjust: exact;
+	}
+
+	.notice[data-orientation="portrait"] {
+		width: 209mm;
+	}
+
+	.region,
+	.region.is-active {
+		background: none;
+		outline: none;
+	}
+
+	/* Unfilled examples, and any line left incomplete without them. */
+	.ghost,
+	.notice p:has(.ghost):not(.notice-name) {
+		display: none;
+	}
 }

@@ -3,183 +3,230 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Obituary Generator</title>
-		<link rel="stylesheet" href="styles.css" />
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<link
-			href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wdth,wght@62.5..100,100..900&display=swap"
-			rel="stylesheet"
+		<title>מודעת אבל · EvelPost</title>
+		<meta
+			name="description"
+			content="יצירת מודעת אבל מכובדת בכמה צעדים פשוטים, להדפסה או לשיתוף."
 		/>
+		<link rel="preload" href="fonts/noto-sans-hebrew-hebrew.woff2" as="font" type="font/woff2" crossorigin />
+		<link rel="stylesheet" href="styles.css" />
+		<!-- Rewritten by script.js when the orientation changes. -->
+		<style id="page-size">
+			@page { size: A4 landscape; margin: 0; }
+		</style>
 	</head>
 
 	<body>
-		<form id="obituary-form">
+		<header class="app-header">
 			<h1>מודעת אבל</h1>
+			<p class="tagline">
+				לחצו על כל חלק במודעה כדי למלא אותו. אפשר לדלג על כל מה שלא מתאים.
+			</p>
+		</header>
 
-			<h4>פתיח</h4>
-
-			<div class="form-container">
-				<div class="form-field">
-					<label for="opening">נוסח הפתיח</label>
-					<select id="opening">
-						<option value="אנו נפרדים בצער וכאב">
-							אנו נפרדים בצער וכאב
-						</option>
-						<option value="בצער רב ובלב כואב">בצער רב ובלב כואב</option>
-						<option value="בלב כבד ובצער עמוק">בלב כבד ובצער עמוק</option>
-						<option value="ברוך דיין האמת">ברוך דיין האמת</option>
-						<option value="custom">נוסח מותאם אישית…</option>
-					</select>
+		<main class="workspace">
+			<!-- The notice is the interface: each region opens its step. -->
+			<section class="stage" aria-label="המודעה">
+				<div class="notice" id="notice" data-orientation="landscape" data-frame="bold">
+					<div class="notice-frame" id="notice-frame">
+						<div class="region region-opening" data-step="opening" role="button" tabindex="0" aria-label="עריכת הפתיח"></div>
+						<div class="region region-name" data-step="name" role="button" tabindex="0" aria-label="עריכת השם"></div>
+						<div class="region region-funeral" data-step="funeral" role="button" tabindex="0" aria-label="עריכת פרטי ההלוויה"></div>
+						<div class="notice-bottom">
+							<div class="region region-shiva" data-step="shiva" role="button" tabindex="0" aria-label="עריכת פרטי השבעה"></div>
+							<div class="region region-mourners" data-step="mourners" role="button" tabindex="0" aria-label="עריכת שמות האבלים"></div>
+						</div>
+					</div>
 				</div>
 
-				<div class="form-field">
-					<label for="opening-custom">פתיח מותאם אישית</label>
-					<input
-						type="text"
-						id="opening-custom"
-						placeholder="כתבו נוסח פתיחה משלכם"
-					/>
+				<div class="actions stage-actions">
+					<button type="button" data-action="pdf">הדפסה / PDF</button>
+					<button type="button" data-action="image" class="button-secondary">שמירה כתמונה</button>
 				</div>
+			</section>
 
-				<div class="form-field">
-					<label for="relation">קרבה</label>
-					<input type="text" id="relation" required placeholder="הזן קרבה" />
-				</div>
-			</div>
+			<form class="editor" id="editor" autocomplete="off" novalidate>
+				<nav class="step-tabs" aria-label="שלבים">
+					<button type="button" class="step-tab" data-step="opening"><span class="step-num">1</span>פתיח</button>
+					<button type="button" class="step-tab" data-step="name"><span class="step-num">2</span>שם</button>
+					<button type="button" class="step-tab" data-step="funeral"><span class="step-num">3</span>הלוויה</button>
+					<button type="button" class="step-tab" data-step="shiva"><span class="step-num">4</span>שבעה</button>
+					<button type="button" class="step-tab" data-step="mourners"><span class="step-num">5</span>אבלים</button>
+					<button type="button" class="step-tab" data-step="finish"><span class="step-num">6</span>סיום</button>
+				</nav>
 
-			<h4>שם המנוח</h4>
+				<!-- 1. Opening -->
+				<section class="step" data-step="opening">
+					<h2>על מי המודעה?</h2>
+					<p class="hint">נתחיל מהמשפט הראשון. אפשר לבחור נוסח מוכן או לכתוב משלכם.</p>
 
-			<div class="form-container">
-				<div class="form-toggle">
-					<label for="show-title">הצג תואר</label>
-					<input type="checkbox" id="show-title" class="toggle-checkbox" />
-				</div>
+					<fieldset class="choice">
+						<legend>לשון</legend>
+						<label class="chip"><input type="radio" name="gender" value="m" checked /><span>הוא</span></label>
+						<label class="chip"><input type="radio" name="gender" value="f" /><span>היא</span></label>
+					</fieldset>
 
-				<div class="form-field">
-					<label for="title">תואר</label>
-					<input type="text" id="title" placeholder="לדוגמה: ד״ר, פרופ׳" />
-				</div>
-
-				<div class="fields-horz">
-					<div class="form-field">
-						<label for="first-name">שם פרטי</label>
+					<div class="field">
+						<label for="relation" data-m="מי הוא היה בשבילכם?" data-f="מי היא הייתה בשבילכם?">מי הוא היה בשבילכם?</label>
 						<input
 							type="text"
-							id="first-name"
-							required
-							placeholder="הזן שם פרטי"
+							id="relation"
+							data-autofocus
+							data-m="לדוגמה: אבינו, סבנו ובעלנו האהוב"
+							data-f="לדוגמה: אמנו, סבתנו ורעייתנו האהובה"
+							placeholder="לדוגמה: אבינו, סבנו ובעלנו האהוב"
 						/>
 					</div>
 
-					<div class="form-field">
-						<label for="last-name">שם משפחה</label>
-						<input
-							type="text"
-							id="last-name"
-							required
-							placeholder="הזן שם משפחה"
-						/>
-					</div>
-				</div>
-
-				<div class="form-toggle">
-					<label for="show-nick-name">הצג כינוי</label>
-					<input type="checkbox" id="show-nick-name" class="toggle-checkbox" />
-				</div>
-
-				<div class="form-field">
-					<label for="nick-name">כינוי</label>
-					<input type="text" id="nick-name" placeholder="הזן כינוי" />
-				</div>
-
-				<div class="form-field">
-					<label for="text-size">גודל טקסט</label>
-					<input
-						type="range"
-						id="text-size"
-						min="0.8"
-						max="2.8"
-						step="0.1"
-						value="2"
-					/>
-				</div>
-			</div>
-
-			<h4>הלוויה</h4>
-
-			<div class="form-container">
-				<div class="fields-horz">
-					<div class="form-field">
-						<label for="date-of-burial">תאריך ההלוויה</label>
-						<input type="date" id="date-of-burial" required />
+					<div class="field">
+						<label for="opening">משפט הפתיחה</label>
+						<select id="opening">
+							<option value="בצער רב ובלב כואב">בצער רב ובלב כואב</option>
+							<option value="אנו נפרדים בצער וכאב">אנו נפרדים בצער וכאב</option>
+							<option value="בלב כבד ובצער עמוק">בלב כבד ובצער עמוק</option>
+							<option value="ברוך דיין האמת">ברוך דיין האמת</option>
+							<option value="custom">משפט משלי…</option>
+							<option value="none">ללא משפט פתיחה</option>
+						</select>
 					</div>
 
-					<div class="form-field">
-						<label for="hour-of-burial">שעת ההלוויה</label>
-						<input type="time" id="hour-of-burial" required />
+					<div class="field" data-show-when="opening=custom">
+						<label for="opening-custom">המשפט שלכם</label>
+						<input type="text" id="opening-custom" placeholder="לדוגמה: באהבה ובגעגוע" />
 					</div>
+				</section>
+
+				<!-- 2. Name -->
+				<section class="step" data-step="name" hidden>
+					<h2>השם במודעה</h2>
+
+					<div class="fields-row">
+						<div class="field">
+							<label for="first-name">שם פרטי</label>
+							<input type="text" id="first-name" data-autofocus />
+						</div>
+						<div class="field">
+							<label for="last-name">שם משפחה</label>
+							<input type="text" id="last-name" />
+						</div>
+					</div>
+
+					<div class="toggles">
+						<label class="toggle"><input type="checkbox" id="show-title" /><span>הוספת תואר</span></label>
+						<label class="toggle"><input type="checkbox" id="show-nick-name" /><span>הוספת כינוי</span></label>
+					</div>
+
+					<div class="field" data-show-when="show-title">
+						<label for="title">תואר</label>
+						<input type="text" id="title" placeholder="לדוגמה: ד״ר, הרב, פרופ׳" />
+					</div>
+
+					<div class="field" data-show-when="show-nick-name">
+						<label for="nick-name">כינוי</label>
+						<input type="text" id="nick-name" placeholder="יופיע בסוגריים" />
+					</div>
+
+					<fieldset class="choice">
+						<legend>אחרי השם</legend>
+						<label class="chip"><input type="radio" name="honorific" value="ז״ל" checked /><span>ז״ל</span></label>
+						<label class="chip"><input type="radio" name="honorific" value="ע״ה" /><span>ע״ה</span></label>
+						<label class="chip"><input type="radio" name="honorific" value="זצ״ל" /><span>זצ״ל</span></label>
+						<label class="chip"><input type="radio" name="honorific" value="הי״ד" /><span>הי״ד</span></label>
+						<label class="chip"><input type="radio" name="honorific" value="" /><span>ללא</span></label>
+					</fieldset>
+
+					<div class="field">
+						<label for="text-size">גודל השם</label>
+						<input type="range" id="text-size" min="1" max="2.8" step="0.1" value="2" />
+						<p class="hint small">שם ארוך יוקטן אוטומטית כדי להיכנס למודעה.</p>
+					</div>
+				</section>
+
+				<!-- 3. Funeral -->
+				<section class="step" data-step="funeral" hidden>
+					<h2>מתי ואיפה נפרדים?</h2>
+
+					<fieldset class="choice">
+						<legend>סוג הטקס</legend>
+						<label class="chip"><input type="radio" name="ceremony" value="funeral" checked /><span>הלוויה</span></label>
+						<label class="chip"><input type="radio" name="ceremony" value="civil" /><span>הלוויה אזרחית</span></label>
+						<label class="chip"><input type="radio" name="ceremony" value="farewell" /><span>טקס פרידה</span></label>
+					</fieldset>
+
+					<div class="fields-row">
+						<div class="field">
+							<label for="date-of-burial">תאריך</label>
+							<input type="date" id="date-of-burial" data-autofocus />
+						</div>
+						<div class="field">
+							<label for="hour-of-burial">שעה</label>
+							<input type="time" id="hour-of-burial" />
+						</div>
+					</div>
+
+					<div class="toggles">
+						<label class="toggle"><input type="checkbox" id="show-hebrew-date" /><span>להוסיף תאריך עברי</span></label>
+					</div>
+
+					<div class="field">
+						<label for="location-of-burial">מקום</label>
+						<input type="text" id="location-of-burial" placeholder="לדוגמה: בית העלמין ירקון, שער ב׳" />
+					</div>
+				</section>
+
+				<!-- 4. Shiva -->
+				<section class="step" data-step="shiva" hidden>
+					<h2>איפה יושבים שבעה?</h2>
+					<p class="hint">כתובת, שעות ביקור, כל מה שחשוב לדעת. אפשר להשאיר ריק.</p>
+					<div class="field">
+						<label for="shiva">פרטי השבעה</label>
+						<textarea id="shiva" rows="4" data-autofocus placeholder="השבעה תתקיים בבית המשפחה&#10;רחוב הרצל 12, תל אביב"></textarea>
+					</div>
+				</section>
+
+				<!-- 5. Mourners -->
+				<section class="step" data-step="mourners" hidden>
+					<h2>מי האבלים?</h2>
+					<p class="hint">שורה לכל שם או קבוצה, כפי שתרצו שיופיע.</p>
+					<div class="field">
+						<label for="grievers">שמות האבלים</label>
+						<textarea id="grievers" rows="5" data-autofocus placeholder="רעייתו: שרה&#10;ילדיו: דוד, מרים ויוסף&#10;הנכדים והנינים"></textarea>
+					</div>
+				</section>
+
+				<!-- 6. Finish -->
+				<section class="step" data-step="finish" hidden>
+					<h2>המודעה מוכנה</h2>
+					<p class="hint">כמה התאמות אחרונות, ואז הדפסה או שיתוף.</p>
+
+					<fieldset class="choice">
+						<legend>כיוון הדף</legend>
+						<label class="chip"><input type="radio" name="orientation" value="landscape" checked /><span>לרוחב</span></label>
+						<label class="chip"><input type="radio" name="orientation" value="portrait" /><span>לאורך</span></label>
+					</fieldset>
+
+					<fieldset class="choice">
+						<legend>מסגרת</legend>
+						<label class="chip"><input type="radio" name="frame" value="bold" checked /><span>עבה</span></label>
+						<label class="chip"><input type="radio" name="frame" value="thin" /><span>דקה, חוסכת דיו</span></label>
+					</fieldset>
+
+					<div class="actions">
+						<button type="button" data-action="pdf">הדפסה / PDF</button>
+						<button type="button" data-action="image" class="button-secondary">שמירה כתמונה</button>
+					</div>
+
+					<button type="button" class="link-button" id="reset-button">להתחיל מודעה חדשה</button>
+				</section>
+
+				<div class="step-nav">
+					<button type="button" class="button-secondary" id="prev-step">הקודם</button>
+					<button type="button" id="next-step">הבא</button>
 				</div>
+			</form>
+		</main>
 
-				<div class="form-toggle">
-					<label for="show-hebrew-date">הצג תאריך עברי</label>
-					<input
-						type="checkbox"
-						id="show-hebrew-date"
-						class="toggle-checkbox"
-					/>
-				</div>
-
-				<div class="form-field">
-					<label for="location-of-burial">כתובת בית העלמין</label>
-					<input
-						type="text"
-						id="location-of-burial"
-						required
-						placeholder="הזן כתובת"
-					/>
-				</div>
-			</div>
-
-			<h4>שבעה</h4>
-
-			<div class="form-container">
-				<div class="form-field">
-					<label for="shiva">מקום השבעה</label>
-					<textarea
-						id="shiva"
-						rows="3"
-						placeholder="כתוב כאן את מקום השבעה"
-					></textarea>
-				</div>
-
-				<div class="form-field">
-					<label for="grievers">האבלים</label>
-					<textarea
-						id="grievers"
-						rows="3"
-						placeholder="כתבו כאן את שמות האבלים"
-					></textarea>
-				</div>
-			</div>
-		</form>
-
-		<section class="preview-section">
-			<!-- <h2>תצוגה מקדימה</h2> -->
-
-			<div id="obituary-preview">
-				<div id="preview-content">
-					<!-- Obituary preview content here -->
-				</div>
-			</div>
-
-			<div class="actions">
-				<button type="button" id="export-button">ייצוא לקובץ</button>
-				<button type="button" id="reset-button" class="button-secondary">
-					איפוס טופס
-				</button>
-			</div>
-		</section>
+		<p class="status" id="status" role="status" aria-live="polite"></p>
 
 		<script src="script.js"></script>
 	</body>
