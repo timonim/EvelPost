@@ -266,6 +266,12 @@ h1 {
 	color: #b4aaa0;
 }
 
+/* Last step: show exactly what the file will contain. */
+.notice.is-clean .ghost,
+.notice.is-clean p:has(.ghost):not(.notice-name) {
+	display: none;
+}
+
 .notice-opening {
 	font-size: 1.05em;
 }
@@ -734,6 +740,118 @@ button:focus-visible {
 	color: var(--ink);
 }
 
+button:disabled {
+	opacity: 0.6;
+	cursor: progress;
+	transform: none;
+}
+
+.finish-links {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem 1.5rem;
+}
+
+/* Still-empty essentials on the last step */
+
+.missing {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.4rem;
+	padding: 0.75rem 0.9rem;
+	border-radius: var(--radius-md);
+	background-color: var(--surface);
+	border: 1px solid var(--card-border);
+	color: var(--ink-muted);
+	font-weight: 600;
+	font-size: 0.95rem;
+}
+
+.missing-items {
+	display: contents;
+}
+
+.missing-item {
+	padding: 0.2em 0.7em;
+	border-radius: 999px;
+	background-color: var(--accent-soft);
+	border-color: var(--accent-soft);
+	color: var(--accent-strong);
+	font-size: 0.9rem;
+	box-shadow: none;
+}
+
+.missing-item:hover {
+	background-color: var(--accent-soft-strong);
+	box-shadow: none;
+}
+
+/* Result dialog */
+
+.export-dialog {
+	width: min(36rem, calc(100vw - 2rem));
+	max-height: calc(100dvh - 2rem);
+	overflow: auto;
+	padding: 1.5rem;
+	border: none;
+	border-radius: var(--radius-lg);
+	background-color: var(--bg-top);
+	color: var(--ink);
+	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.export-dialog[open] {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.export-dialog::backdrop {
+	background-color: rgba(40, 33, 27, 0.55);
+}
+
+.export-dialog h2 {
+	margin: 0;
+	font-size: 1.4rem;
+	font-weight: 800;
+}
+
+.export-ready,
+.export-error {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.export-error p {
+	margin: 0;
+}
+
+.export-dialog[data-mode="ready"] .export-error,
+.export-dialog[data-mode="error"] .export-ready {
+	display: none;
+}
+
+.export-preview {
+	display: block;
+	width: 100%;
+	max-height: 55dvh;
+	object-fit: contain;
+	background: #fff;
+	box-shadow: var(--shadow-page);
+	/* Allow the long-press "save image" menu on phones. */
+	-webkit-touch-callout: default;
+}
+
+.export-dialog .actions {
+	justify-content: flex-start;
+}
+
+.export-dialog .hint.small {
+	margin: 0;
+}
+
 /* Status toast */
 
 .status {
@@ -774,7 +892,8 @@ button:focus-visible {
 	.app-header,
 	.editor,
 	.actions,
-	.status {
+	.status,
+	.export-dialog {
 		display: none !important;
 	}
 

@@ -40,7 +40,7 @@
 				</div>
 
 				<div class="actions stage-actions">
-					<button type="button" data-action="pdf">הדפסה / PDF</button>
+					<button type="button" data-action="pdf">הורדת PDF</button>
 					<button type="button" data-action="image" class="button-secondary">שמירה כתמונה</button>
 				</div>
 			</section>
@@ -197,7 +197,12 @@
 				<!-- 6. Finish -->
 				<section class="step" data-step="finish" hidden>
 					<h2>המודעה מוכנה</h2>
-					<p class="hint">כמה התאמות אחרונות, ואז הדפסה או שיתוף.</p>
+					<p class="hint">כך בדיוק היא תיראה בקובץ. כמה התאמות אחרונות, ואז הורדה או שיתוף.</p>
+
+					<div class="missing" id="missing" hidden>
+						<span>עדיין לא מילאתם:</span>
+						<span class="missing-items"></span>
+					</div>
 
 					<fieldset class="choice">
 						<legend>כיוון הדף</legend>
@@ -212,11 +217,14 @@
 					</fieldset>
 
 					<div class="actions">
-						<button type="button" data-action="pdf">הדפסה / PDF</button>
+						<button type="button" data-action="pdf">הורדת PDF</button>
 						<button type="button" data-action="image" class="button-secondary">שמירה כתמונה</button>
 					</div>
 
-					<button type="button" class="link-button" id="reset-button">להתחיל מודעה חדשה</button>
+					<div class="finish-links">
+						<button type="button" class="link-button" data-action="print">הדפסה ישירה מהדפדפן</button>
+						<button type="button" class="link-button" id="reset-button">להתחיל מודעה חדשה</button>
+					</div>
 				</section>
 
 				<div class="step-nav">
@@ -225,6 +233,36 @@
 				</div>
 			</form>
 		</main>
+
+		<!-- Shows the finished file before it is saved, shared or printed. -->
+		<dialog class="export-dialog" id="export-dialog" aria-labelledby="export-title">
+			<h2 id="export-title">הקובץ מוכן</h2>
+
+			<div class="export-ready">
+				<img class="export-preview" id="export-preview" alt="המודעה, כפי שהיא מופיעה בקובץ" />
+				<div class="actions">
+					<button type="button" id="export-share">שיתוף</button>
+					<button type="button" id="export-download">הורדה</button>
+					<button type="button" id="export-open" class="button-secondary">פתיחה והדפסה</button>
+				</div>
+				<p class="hint small">
+					אם ההורדה לא מתחילה, אפשר ללחוץ לחיצה ארוכה על התמונה ולשמור אותה.
+				</p>
+				<button type="button" class="link-button" id="export-close">חזרה לעריכה</button>
+			</div>
+
+			<div class="export-error">
+				<p>
+					הפרטים שמילאתם שמורים ולא אבדו. אפשר לנסות שוב, או להדפיס ישירות
+					מהדפדפן ושם לבחור ״שמירה כ-PDF״.
+				</p>
+				<div class="actions">
+					<button type="button" id="export-retry">לנסות שוב</button>
+					<button type="button" id="export-print" class="button-secondary">הדפסה ישירה</button>
+				</div>
+				<button type="button" class="link-button" id="export-error-close">חזרה לעריכה</button>
+			</div>
+		</dialog>
 
 		<p class="status" id="status" role="status" aria-live="polite"></p>
 

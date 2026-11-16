@@ -4,7 +4,6 @@ const STORAGE_KEY = 'evelpost-form';
 
 const form = document.getElementById('editor');
 const notice = document.getElementById('notice');
-const frame = document.getElementById('notice-frame');
 const textSizeSlider = document.getElementById('text-size');
 const prevButton = document.getElementById('prev-step');
 const nextButton = document.getElementById('next-step');
@@ -204,36 +203,40 @@ function renderNotice(v) {
 
 // All sizes inside the notice are relative to its width (cqw / em), so the
 // fitted values are valid at any size: on screen, in print and as an image.
-const bottom = frame.querySelector('.notice-bottom');
-function overflows({ ignoreName = false } = {}) {
-  if (frame.scrollHeight > frame.clientHeight + 1) return true;
-  if (bottom.scrollWidth > bottom.clientWidth + 1) return true;
-  return regions.some(
+// Works on the on-screen notice and on the off-screen copy used for export.
+function overflows(root, { ignoreName = false } = {}) {
+  const box = root.querySelector('.notice-frame');
+  if (box.scrollHeight > box.clientHeight + 1) return true;
+  const bottomRow = root.querySelector('.notice-bottom');
+  if (bottomRow.scrollWidth > bottomRow.clientWidth + 1) return true;
+  return [...root.querySelectorAll('.region')].some(
     (region) =>
       !(ignoreName && region.dataset.step === 'name') &&
       region.scrollWidth > region.clientWidth + 1
   );
 }
 
-function fitNotice() {
-  if (!frame.clientWidth) return;
-  const orientation = notice.dataset.orientation;
-  const name = frame.querySelector('.notice-name');
+function fitNotice(root = notice) {
+  const box = root.querySelector('.notice-frame');
+  if (!box.clientWidth) return;
+  const orientation = root.dataset.orientation;
+  const name = box.querySelector('.notice-name');
 
   // 1. Base text size: the largest that fits, by binary search.
   let nameScale = Number(textSizeSlider.value);
   name.style.fontSize = `${nameScale}em`;
   let lo = MIN_FONT;
   let hi = MAX_FONT[orientation];
-  frame.style.fontSize = `${hi}cqw`;
-  if (overflows({ ignoreName: true })) {
-    for (let i = 0; i < 9; i++) {
+  box.style.fontSize = `${hi}cqw`;
+  if (overflows(root, { ignoreName: true })) {
+    for (let i = 0; i < 10; i++) {
       const mid = (lo + hi) / 2;
-      frame.style.fontSize = `${mid}cqw`;
-      if (overflows({ ignoreName: true })) hi = mid;
+      box.style.fontSize = `${mid}cqw`;
+      if (overflows(root, { ignoreName: true })) hi = mid;
       else lo = mid;
     }
-    frame.style.fontSize = `${lo}cqw`;
+    // A little headroom, so font rounding at another size can't clip.
+    box.style.fontSize = `${lo * 0.98}cqw`;
   }
 
   // 2. The name: shrink it below the chosen size only if a part is too wide.
@@ -259,6 +262,7 @@ function goToStep(stepId, { focus = false } = {}) {
   regions.forEach((region) =>
     region.classList.toggle('is-active', region.dataset.step === stepId)
   );
+  updateCleanMode();
 
   prevButton.hidden = index === 0;
   nextButton.hidden = index === stepIds.length - 1;
@@ -269,6 +273,42 @@ function goToStep(stepId, { focus = false } = {}) {
     const target = steps[index].querySelector('[data-autofocus]');
     if (target) target.focus({ preventScroll: true });
   }
+}
+
+// On the last step the notice shows exactly what the file will contain:
+// no examples, no incomplete lines.
+function updateCleanMode() {
+  notice.classList.toggle('is-clean', currentStep === 'finish');
+  fitNotice();
+}
+
+// Details a notice normally has; listed on the last step if still empty.
+const ESSENTIALS = [
+  { id: 'first-name', label: 'שם פרטי', step: 'name' },
+  { id: 'last-name', label: 'שם משפחה', step: 'name' },
+  { id: 'date-of-burial', label: 'תאריך', step: 'funeral' },
+  { id: 'hour-of-burial', label: 'שעה', step: 'funeral' },
+  { id: 'location-of-burial', label: 'מקום ההלוויה', step: 'funeral' },
+];
+
+function updateMissing(v) {
+  const missing = ESSENTIALS.filter(({ id }) => !v[id].trim());
+  const list = document.getElementById('missing');
+  list.hidden = missing.length === 0;
+  list.querySelector('.missing-items').replaceChildren(
+    ...missing.map(({ id, label, step }) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'missing-item';
+      button.textContent = label;
+      button.addEventListener('click', () => {
+        goToStep(step);
+        document.getElementById(id).focus();
+        revealEditor();
+      });
+      return button;
+    })
+  );
 }
 
 // On narrow screens the editor sits under the sticky notice; bring the
@@ -315,6 +355,7 @@ function update() {
   updateConditionalFields();
   updateGenderedText(values.gender);
   updateStepProgress(values);
+  updateMissing(values);
   renderNotice(values);
 }
 
@@ -353,8 +394,38 @@ function restoreDraft() {
 }
 
 /* ----------------------------------------------------------------------- */
-/* Output: print / PDF and image                                            */
+/* Output: PDF and image files, built in the browser                        */
 /* ----------------------------------------------------------------------- */
+
+// The notice is rendered to a 300 dpi A4 canvas; the PDF is that one image
+// on one A4 page. Nothing depends on the browser's print dialog (margins,
+// scaling, headers), so every browser produces the same file.
+const PAGE_PX = { landscape: [3508, 2480], portrait: [2480, 3508] };
+const PAGE_PT = { landscape: [841.89, 595.28], portrait: [595.28, 841.89] };
+const RENDER_TIMEOUT = 30000;
+
+// Same files and ranges as the @font-face rules in styles.css. They are
+// inlined into the render as data URLs, so the image never misses the font.
+const FONT_FILES = [
+  {
+    url: 'fonts/noto-sans-hebrew-hebrew.woff2',
+    range: 'U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F',
+  },
+  {
+    url: 'fonts/noto-sans-hebrew-latin.woff2',
+    range:
+      'U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD',
+  },
+];
+
+// Safari (and every iOS browser) often leaves fonts out of the first render.
+const isWebKit =
+  /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+  (/Safari\//.test(navigator.userAgent) && !/Chrome|Chromium|Edg|Firefox/.test(navigator.userAgent));
+const isTouch = window.matchMedia('(pointer: coarse)').matches;
+
+const exportDialog = document.getElementById('export-dialog');
+const exportButtons = [...document.querySelectorAll('[data-action]')];
 
 function showStatus(message) {
   statusElement.textContent = message;
@@ -369,14 +440,30 @@ function noticeFileName(extension) {
   return `מודעת אבל${name ? ` - ${name}` : ''}.${extension}`;
 }
 
-// The print stylesheet shows only the notice, sized to the A4 page.
-async function exportToPDF() {
-  try {
-    await document.fonts.ready;
-  } catch (error) {
-    // Fonts API unavailable — print anyway.
-  }
-  window.print();
+function withTimeout(promise, ms) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error('Timed out')), ms)),
+  ]);
+}
+
+function canvasToBlob(canvas, type, quality) {
+  return new Promise((resolve, reject) =>
+    canvas.toBlob(
+      (blob) => (blob ? resolve(blob) : reject(new Error(`Could not encode ${type}`))),
+      type,
+      quality
+    )
+  );
+}
+
+function blobToDataUrl(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(blob);
+  });
 }
 
 let imageLibrary;
@@ -394,64 +481,320 @@ function loadImageLibrary() {
   return imageLibrary;
 }
 
-async function exportToImage() {
-  showStatus('מכינים את התמונה…');
+let fontEmbedCss;
+function loadFontEmbedCss() {
+  fontEmbedCss ??= Promise.all(
+    FONT_FILES.map(async ({ url, range }) => {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`Font ${url}: ${response.status}`);
+      const dataUrl = await blobToDataUrl(await response.blob());
+      return `@font-face { font-family: "Noto Sans Hebrew"; src: url(${dataUrl}) format("woff2"); font-weight: 100 900; font-stretch: 62.5% 100%; unicode-range: ${range}; }`;
+    })
+  )
+    .then((rules) => rules.join('\n'))
+    .catch((error) => {
+      fontEmbedCss = null;
+      throw error;
+    });
+  return fontEmbedCss;
+}
+
+async function ensureFontsLoaded() {
+  if (!document.fonts) return;
+  await Promise.all(
+    [500, 600, 800, 900].map((weight) =>
+      document.fonts.load(`${weight} 40px "Noto Sans Hebrew"`, 'אבג 012')
+    )
+  );
+  await document.fonts.ready;
+  if (!document.fonts.check('900 40px "Noto Sans Hebrew"', 'אבג')) {
+    throw new Error('Font not loaded');
+  }
+}
+
+// Sanity check of a render: the frame must be there, and text inside it. Catches blank and font-less
+// renders before anyone downloads them.
+function inspectRender(canvas) {
+  const width = 400;
+  const height = Math.round((width * canvas.height) / canvas.width);
+  const small = document.createElement('canvas');
+  small.width = width;
+  small.height = height;
+  const context = small.getContext('2d', { willReadFrequently: true });
+  context.fillStyle = '#fff';
+  context.fillRect(0, 0, width, height);
+  context.drawImage(canvas, 0, 0, width, height);
+  const { data } = context.getImageData(0, 0, width, height);
+  const isInk = (x, y) => data[(y * width + x) * 4] < 160;
+
+  // The frame sits 4-5% in from the edge: look for it along the middle row.
+  let frame = false;
+  const middle = Math.round(height / 2);
+  for (let x = 0; x < width * 0.1; x++) frame ||= isInk(x, middle);
+
+  // Text: inked share of the area well inside the frame.
+  let ink = 0;
+  let total = 0;
+  for (let y = Math.round(height * 0.12); y < height * 0.88; y++) {
+    for (let x = Math.round(width * 0.12); x < width * 0.88; x++) {
+      total++;
+      if (isInk(x, y)) ink++;
+    }
+  }
+  return { frame, ink: ink / total };
+}
+
+// Build a clean, print-size copy of the notice off screen and render it.
+async function renderNoticeCanvas() {
+  const [htmlToImage, fontCss] = await Promise.all([
+    loadImageLibrary(),
+    loadFontEmbedCss(),
+    ensureFontsLoaded(),
+  ]);
+
+  const [width, height] = PAGE_PX[notice.dataset.orientation];
   const holder = document.createElement('div');
+  holder.className = 'export-holder';
+  const copy = notice.cloneNode(true);
+  copy.removeAttribute('id');
+  copy.querySelectorAll('[id]').forEach((element) => element.removeAttribute('id'));
+  // Drop unfilled examples, and lines left incomplete without them.
+  copy.querySelectorAll('p:not(.notice-name) .ghost').forEach((element) =>
+    element.closest('p').remove()
+  );
+  copy.querySelectorAll('.ghost').forEach((element) => element.remove());
+  copy.classList.add('is-export');
+  copy.classList.remove('is-clean');
+  copy.style.width = `${width}px`;
+  holder.append(copy);
+  document.body.append(holder);
+
   try {
-    const htmlToImage = await loadImageLibrary();
-    await document.fonts.ready;
-
-    // Render a clean copy at a fixed, print-quality width. Sizes inside are
-    // width-relative, so the copy lays out exactly like the preview.
-    const width = 2000;
-    const height = Math.round(width / ASPECT[notice.dataset.orientation]);
-    const copy = notice.cloneNode(true);
-    copy.removeAttribute('id');
-    copy.querySelectorAll('[id]').forEach((element) => element.removeAttribute('id'));
-    // Drop unfilled examples, and lines left incomplete without them.
-    copy.querySelectorAll('p:not(.notice-name) .ghost').forEach((element) =>
-      element.closest('p').remove()
-    );
-    copy.querySelectorAll('.ghost').forEach((element) => element.remove());
-    copy.classList.add('is-export');
-    copy.style.width = `${width}px`;
-    holder.className = 'export-holder';
-    holder.append(copy);
-    document.body.append(holder);
-
-    const blob = await htmlToImage.toBlob(copy, {
+    // Fit again at the final size, so rounding at this scale can't clip.
+    fitNotice(copy);
+    const expectInk = Boolean(copy.querySelector('.notice-frame').textContent.trim());
+    const options = {
       width,
       height,
       pixelRatio: 1,
       backgroundColor: '#ffffff',
-    });
-    const file = new File([blob], noticeFileName('png'), { type: 'image/png' });
+      fontEmbedCSS: fontCss,
+    };
 
-    // On phones, offer the share sheet (WhatsApp etc.); elsewhere, download.
-    const isTouch = window.matchMedia('(pointer: coarse)').matches;
-    if (isTouch && navigator.canShare?.({ files: [file] })) {
-      try {
-        await navigator.share({ files: [file], title: 'מודעת אבל' });
-      } catch (error) {
-        if (error.name !== 'AbortError') throw error;
-      }
-      statusElement.classList.remove('is-visible');
-      return;
+    const attempts = isWebKit ? 3 : 2;
+    let canvas;
+    for (let attempt = 1; attempt <= attempts; attempt++) {
+      canvas = await htmlToImage.toCanvas(copy, options);
+      if (isWebKit && attempt === 1) continue; // warm-up pass, see isWebKit
+      const result = inspectRender(canvas);
+      if (result.frame && (!expectInk || result.ink > 0.002)) return canvas;
+      console.warn('Render check failed, retrying', result);
     }
-
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(file);
-    link.download = file.name;
-    link.click();
-    setTimeout(() => URL.revokeObjectURL(link.href), 10000);
-    showStatus('התמונה נשמרה');
-  } catch (error) {
-    console.error('Image export failed:', error);
-    showStatus('לא הצלחנו ליצור תמונה. אפשר לנסות שוב, או להשתמש בהדפסה / PDF.');
+    throw new Error('Render check failed');
   } finally {
     holder.remove();
   }
 }
+
+// A one-page PDF holding the notice as a JPEG, sized exactly to A4.
+function buildPdf(jpegBytes, pixelWidth, pixelHeight, orientation, title) {
+  const [pageWidth, pageHeight] = PAGE_PT[orientation];
+  const encoder = new TextEncoder();
+  const chunks = [];
+  const offsets = [];
+  let length = 0;
+  const write = (data) => {
+    const bytes = typeof data === 'string' ? encoder.encode(data) : data;
+    chunks.push(bytes);
+    length += bytes.length;
+  };
+  const object = (number, ...body) => {
+    offsets[number] = length;
+    write(`${number} 0 obj\n`);
+    body.forEach(write);
+    write('\nendobj\n');
+  };
+  // PDF text strings: UTF-16BE with a byte-order mark, as hex.
+  const pdfText = (text) =>
+    `<FEFF${[...text]
+      .map((char) => char.charCodeAt(0).toString(16).padStart(4, '0'))
+      .join('')}>`;
+
+  const drawing = `q ${pageWidth} 0 0 ${pageHeight} 0 0 cm /Notice Do Q`;
+  write('%PDF-1.4\n%âãÏÓ\n');
+  object(1, '<< /Type /Catalog /Pages 2 0 R >>');
+  object(2, '<< /Type /Pages /Kids [3 0 R] /Count 1 >>');
+  object(
+    3,
+    `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pageWidth} ${pageHeight}] ` +
+      '/Resources << /XObject << /Notice 4 0 R >> >> /Contents 5 0 R >>'
+  );
+  object(
+    4,
+    `<< /Type /XObject /Subtype /Image /Width ${pixelWidth} /Height ${pixelHeight} ` +
+      `/ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpegBytes.length} >>\nstream\n`,
+    jpegBytes,
+    '\nendstream'
+  );
+  object(5, `<< /Length ${drawing.length} >>\nstream\n${drawing}\nendstream`);
+  object(6, `<< /Title ${pdfText(title)} /Creator (EvelPost) >>`);
+
+  const xref = length;
+  write(`xref\n0 7\n0000000000 65535 f \n`);
+  for (let number = 1; number <= 6; number++) {
+    write(`${String(offsets[number]).padStart(10, '0')} 00000 n \n`);
+  }
+  write(`trailer\n<< /Size 7 /Root 1 0 R /Info 6 0 R >>\nstartxref\n${xref}\n%%EOF\n`);
+  return new Blob(chunks, { type: 'application/pdf' });
+}
+
+// A lighter copy of the render for the result dialog (and for saving by
+// long-press when downloads are blocked, e.g. in in-app browsers).
+async function createPreview(canvas) {
+  const width = 1600;
+  const small = document.createElement('canvas');
+  small.width = width;
+  small.height = Math.round((width * canvas.height) / canvas.width);
+  const context = small.getContext('2d');
+  context.imageSmoothingQuality = 'high';
+  context.drawImage(canvas, 0, 0, small.width, small.height);
+  return canvasToBlob(small, 'image/jpeg', 0.9);
+}
+
+async function createFile(kind, canvas) {
+  const preview = await createPreview(canvas);
+  if (kind === 'image') {
+    const png = await canvasToBlob(canvas, 'image/png');
+    return { file: new File([png], noticeFileName('png'), { type: 'image/png' }), preview };
+  }
+  const jpeg = await canvasToBlob(canvas, 'image/jpeg', 0.92);
+  const bytes = new Uint8Array(await jpeg.arrayBuffer());
+  const pdf = buildPdf(bytes, canvas.width, canvas.height, notice.dataset.orientation, noticeFileName('pdf').slice(0, -4));
+  return { file: new File([pdf], noticeFileName('pdf'), { type: 'application/pdf' }), preview };
+}
+
+function setBusy(activeButton) {
+  exportButtons.forEach((button) => {
+    button.disabled = Boolean(activeButton);
+    if (button === activeButton) {
+      button.dataset.label = button.textContent;
+      button.textContent = 'מכינים את הקובץ…';
+    } else if (!activeButton && button.dataset.label) {
+      button.textContent = button.dataset.label;
+      delete button.dataset.label;
+    }
+  });
+}
+
+let exportUrls = [];
+function openDialog() {
+  if (typeof exportDialog.showModal === 'function') exportDialog.showModal();
+  else exportDialog.setAttribute('open', '');
+}
+
+function closeDialog() {
+  if (typeof exportDialog.close === 'function') exportDialog.close();
+  else exportDialog.removeAttribute('open');
+}
+
+exportDialog.addEventListener('close', () => {
+  exportUrls.forEach((url) => URL.revokeObjectURL(url));
+  exportUrls = [];
+});
+
+function downloadFile(file) {
+  const url = URL.createObjectURL(file);
+  exportUrls.push(url);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = file.name;
+  document.body.append(link);
+  link.click();
+  link.remove();
+}
+
+// Show the finished file. Saving, sharing and opening happen from here, on a
+// fresh tap: phones refuse to share after a long render, and seeing the
+// result first means nobody downloads a surprise.
+async function showResult(kind, file, preview) {
+  exportDialog.dataset.mode = 'ready';
+  const previewUrl = URL.createObjectURL(preview);
+  exportUrls.push(previewUrl);
+  const previewImage = document.getElementById('export-preview');
+  previewImage.src = previewUrl;
+  try {
+    await previewImage.decode(); // open with the picture already showing
+  } catch (error) {
+    // Older browsers: it will appear when ready.
+  }
+  document.getElementById('export-title').textContent =
+    kind === 'pdf' ? 'קובץ ה-PDF מוכן' : 'התמונה מוכנה';
+
+  const shareButton = document.getElementById('export-share');
+  const downloadButton = document.getElementById('export-download');
+  const openButton = document.getElementById('export-open');
+  const canShare = isTouch && navigator.canShare?.({ files: [file] });
+  shareButton.hidden = !canShare;
+  openButton.hidden = kind !== 'pdf' || isTouch;
+  downloadButton.classList.toggle('button-secondary', Boolean(canShare));
+
+  shareButton.onclick = async () => {
+    try {
+      await navigator.share({ files: [file], title: 'מודעת אבל' });
+    } catch (error) {
+      if (error.name !== 'AbortError') downloadFile(file);
+    }
+  };
+  downloadButton.onclick = () => {
+    downloadFile(file);
+    showStatus('הקובץ נשמר');
+  };
+  openButton.onclick = () => {
+    const url = URL.createObjectURL(file);
+    exportUrls.push(url);
+    if (!window.open(url, '_blank')) downloadFile(file);
+  };
+  openDialog();
+  (canShare ? shareButton : downloadButton).focus();
+}
+
+function showFailure(kind) {
+  exportDialog.dataset.mode = 'error';
+  document.getElementById('export-title').textContent = 'משהו השתבש ביצירת הקובץ';
+  document.getElementById('export-retry').onclick = () => {
+    closeDialog();
+    exportFile(kind);
+  };
+  openDialog();
+}
+
+let exporting = false;
+async function exportFile(kind, button) {
+  if (exporting) return;
+  exporting = true;
+  setBusy(button);
+  try {
+    const canvas = await withTimeout(renderNoticeCanvas(), RENDER_TIMEOUT);
+    const { file, preview } = await createFile(kind, canvas);
+    await showResult(kind, file, preview);
+  } catch (error) {
+    console.error('Export failed:', error);
+    showFailure(kind);
+  } finally {
+    exporting = false;
+    setBusy(null);
+  }
+}
+
+// Fallback: the browser's own print dialog, with the print stylesheet.
+function printDirectly() {
+  closeDialog();
+  notice.classList.add('is-clean');
+  fitNotice();
+  window.print();
+}
+
+window.addEventListener('afterprint', () => updateCleanMode());
 
 /* ----------------------------------------------------------------------- */
 /* Wiring                                                                   */
@@ -495,12 +838,15 @@ nextButton.addEventListener('click', () => {
   revealEditor();
 });
 
-document
-  .querySelectorAll('[data-action="pdf"]')
-  .forEach((button) => button.addEventListener('click', exportToPDF));
-document
-  .querySelectorAll('[data-action="image"]')
-  .forEach((button) => button.addEventListener('click', exportToImage));
+exportButtons.forEach((button) =>
+  button.addEventListener('click', () => {
+    if (button.dataset.action === 'print') printDirectly();
+    else exportFile(button.dataset.action, button);
+  })
+);
+document.getElementById('export-print').addEventListener('click', printDirectly);
+document.getElementById('export-close').addEventListener('click', closeDialog);
+document.getElementById('export-error-close').addEventListener('click', closeDialog);
 
 document.getElementById('reset-button').addEventListener('click', () => {
   if (!confirm('למחוק את כל הפרטים ולהתחיל מודעה חדשה?')) return;
