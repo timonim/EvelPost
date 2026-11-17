@@ -1,6 +1,6 @@
 # Changelog
 
-The story behind these versions, with screenshots: [docs/evolution.md](docs/evolution.md).
+The product story behind these versions, with screenshots: [docs/evolution.md](docs/evolution.md). Technical details: [docs/technical-notes.md](docs/technical-notes.md).
 
 ## v3: notice-first (November 2026, branch `notice-first-editor`)
 

@@ -1,6 +1,7 @@
 # v2: the production version (June 2026)
 
-A record of EvelPost as it is live today, written before v3 replaces it.
+A record of EvelPost as it is live today, written before v3 replaces it. The
+story of what changed next is in [evolution.md](evolution.md).
 
 | | |
 | --- | --- |
@@ -71,41 +72,36 @@ it stays open. If pop-ups are blocked, an alert asks to allow them.
 
 ## Technology
 
-Plain HTML, CSS and JavaScript, no build step. External requests: Google
-Fonts (Noto Sans Hebrew, variable width and weight) and `normalize.css` from
-cdnjs.
+Plain HTML, CSS and JavaScript, no build step. It loads Google Fonts (Noto
+Sans Hebrew) and `normalize.css` from outside servers.
 
-## Known issues
+## Where people run into trouble
 
-Found in a review in November 2026, each reproduced with the
-[test notice](evolution.md#the-test-notice) unless stated.
+Found in a design review in November 2026, using the
+[test notice](technical-notes.md#the-test-notice). None of this has been seen
+with real users yet.
 
-1. **Text is cut off without warning.** The notice has a fixed text size and
-   `overflow: hidden`. With the test notice, the last shiva line and two of
-   the four mourner lines are missing, on screen and in the export.
-2. **The export can come out broken.** Through Chromium's print-to-PDF at
-   100% scale, the test notice came out shifted and split across two pages
-   (images below). Likely cause: the export window's `body` keeps the app's
-   flex-centred layout and is not sized to the page, so the notice is placed
-   against the window. Not observed on a real device; the browser's "fit to
-   page" setting may hide it.
-3. **Male-only wording.** `פטירתו של` and `ז"ל` are fixed; a notice for a
-   woman reads wrongly and there is no way to change the honorific.
-4. **The empty state looks broken.** Before the form is filled, the notice
-   shows fragments: a lone `ז"ל`, `הלוויה תתקיים ב,`, `בשעה .`.
-5. **Long names wrap badly.** `כהן-לוינשטיין` breaks after the hyphen,
-   leaving `כהן-` on its own line.
-6. **The result is out of view while typing.** On phones the notice is below
-   the whole form; on desktop it scrolls away with the page.
-7. **Only the print dialog.** No image to share, and the result depends on
-   each browser's print settings and pop-up blocking.
-8. **Depends on outside services** for the font and the CSS reset.
-9. **Smaller:** placeholder text at 2.3:1 contrast (below the 4.5:1 guideline);
-   English page title; heavy frame and landscape only.
-
-| Empty state | Export, page 1 | Export, page 2 |
+| What a person experiences | Why it matters | Cause, briefly |
 | --- | --- | --- |
-| ![Empty](img/v2-empty.png) | ![Page 1](img/v2-export-page1.png) | ![Page 2](img/v2-export-page2.png) |
+| **Their words disappear.** With the test notice, two of the four mourner lines and part of the shiva details are cut off, on screen and in the file. Nothing says so. | They may print and post a notice that's missing family members, and not notice. | A fixed text size inside a frame that hides overflow. |
+| **The final file can come out wrong.** The test notice exported to two sheets, shifted off the page (see below). | The last step is the one where a failure costs the most. | The export window keeps the page's layout instead of being sized to A4. Reproduced in Chromium's print engine; not seen on a real device. |
+| **The empty notice looks broken.** A lone `ז"ל`, `הלוויה תתקיים ב,`, `בשעה .` | Fragments read as errors, at the moment someone most needs reassurance. | The notice is assembled from whatever is filled in. |
+| **The wording only fits a man.** `פטירתו של` and `ז"ל` are fixed. | A notice for a woman, or for a family that doesn't use `ז"ל`, has to be corrected on paper. | Hard-coded text. |
+| **They can't see the result while typing.** On a phone, the notice is below the whole form. | They type blind, then scroll down to check. | Form first, preview second. |
+| **Long names break badly.** `כהן-לוינשטיין` splits after the hyphen, leaving `כהן-` alone on a line. | Looks careless on a notice. | Names wrap like normal text. |
+| **No way to send it.** The only output is the browser's print dialog. | Most notices are shared by phone, not just printed; a PDF has to be saved and found again first. | No image or share option. |
+| **A lot to take in at once.** 16 fields on one page. | Heavy for someone in a hurry and in grief. | The form model. |
+
+Smaller: the page title is in English; placeholder text has 2.3:1 contrast
+(below the 4.5:1 guideline); the heavy frame and landscape are the only
+choices; "reset" deletes everything with no confirmation; the page depends on
+outside servers for its font.
+
+| Empty state | Export, sheet 1 | Export, sheet 2 |
+| --- | --- | --- |
+| ![Empty](img/v2-empty.png) | ![Sheet 1](img/v2-export-page1.png) | ![Sheet 2](img/v2-export-page2.png) |
+
+How these were found and measured: [technical-notes.md](technical-notes.md).
 
 ## What v2 improved over v1
 
@@ -115,4 +111,4 @@ the optional title, Hebrew numerals in the Hebrew date (v1 printed
 `lang="en"`), escaping of user text (v1 inserted it raw), local date parsing,
 mourner line breaks (v1 lost them), saved drafts and reset, a notice sized to
 its own width, and an export that waits for fonts instead of a load event that
-could already have fired. See [evolution.md](evolution.md#timeline).
+could already have fired. See [evolution.md](evolution.md#how-it-got-here).

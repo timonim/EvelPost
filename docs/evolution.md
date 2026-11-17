@@ -1,287 +1,266 @@
-# How EvelPost evolved
+# EvelPost: from a form to the notice itself
 
-EvelPost started in December 2023 because writing a death notice for a family
-member, with the tools available online, was harder than it should be: clunky
-interfaces, no care for the culture, and technical problems at the worst
-possible moment. This document follows the tool from its first commit to the
-current redesign, and explains what changed between the version that is live
-today (v2) and the new one (v3).
+**The product story.** EvelPost helps a family put together a death notice
+(מודעת אבל) in minutes. Versions 1 and 2 gave people a form to fill in.
+Version 3 lets them shape the notice directly. This document explains who
+it's for, what was wrong with the form, and the design decisions behind the
+change. How it's built is kept apart in [technical-notes.md](technical-notes.md).
 
-Detailed records of each version:
-
-- [v2: the current production version](v2-production.md) (live since June 2026)
-- [v3: the notice-first redesign](v3-notice-first.md) (November 2026)
-
-## Versions at a glance
-
-| Version | Date | Git | In one line |
-| --- | --- | --- | --- |
-| Prototype | 12 Dec 2023 | `5390796`, PR #1 | A form above a live preview. |
-| Form & preview | 17–21 Dec 2023 | PRs #2–#6 | Card sections, side-by-side layout, nickname and Hebrew date. |
-| **v1** | 2 Jan – 6 Feb 2024 | PRs #7–#8, tag `v1` | Export through the print dialog; a mobile layout. |
-| **v2** (production) | 24 Jun 2026 | `ae58f74`, tag `v2` | Refresh: opening lines, title, drafts, proper Hebrew dates, safer code. |
-| **v3** | Nov 2026 | branch `notice-first-editor` | The notice is the interface; inclusive wording; reliable PDF and image. |
-
-## The test notice
-
-Every screenshot in these documents uses the same notice, entered the same way
-in each version, so the versions can be compared fairly. It is deliberately a
-little demanding: a hyphenated surname, a nickname, three lines of shiva
-details and four lines of mourners.
-
-| Field | Value |
+| | |
 | --- | --- |
-| Relation | אבינו, סבנו ובעלנו האהוב |
-| Name | אברהם (אבי) כהן-לוינשטיין |
-| Funeral | 18.11.2026, 14:30, Hebrew date on, בית העלמין ירקון, שער ב׳ |
-| Shiva | השבעה תתקיים בבית המשפחה / רחוב הרצל 12, תל אביב / שעות ביקור 10:00-13:00, 17:00-21:00 |
-| Mourners | רעייתו: שרה / ילדיו: דוד, מרים ויוסף / נכדיו: נועה, איתי, תמר ועומר / הנינים וכל המשפחה |
+| Before | [v2, the live version](v2-production.md): a 16-field form beside a preview |
+| After | [v3](v3-notice-first.md): the notice is the interface |
 
-Captured in Chromium at 1440×900 (desktop) and 390×844 (phone). Exports were
-captured the way each version produces them; see [Method](#method).
+![v2](img/v2-desktop.png)
+*v2: a form, and a preview of the result.*
 
-## Timeline
+![v3](img/v3-desktop.png)
+*v3: the same notice, edited in place.*
 
-### Prototype (December 2023)
+## Why it exists
 
-A single column: the browser's default form controls, and the notice below
-them. A contributor (guychouk, PR #1) switched the notice to relative `em`
-sizes, so the text scales with the page instead of using fixed pixels.
+Writing a notice for a loved family member, with the tools available online,
+was harder than it should have been: clunky interfaces, no care for the
+culture, and technical problems at the worst possible moment. EvelPost began
+as a response to that, and the goals that came out of it still decide every
+choice: simple, customisable, accessible, free, similar to the familiar
+format, and printable at home.
 
-![Prototype: a plain form above the notice](img/stage1-prototype-desktop.png)
+## Who it's for, and the moment they're in
 
-Already visible here, and still present in v2: when the text doesn't fit, it
-is cut off at the frame without warning (the mourners are missing entirely).
+The person using EvelPost is usually not an expert in anything. They are a
+family member who has been asked to "take care of the notice", often within a
+day or two of the death, often on a phone, often while being interrupted by
+calls and relatives. Details arrive piece by piece: the funeral time is
+confirmed later, the shiva address later still. They may have never made one
+before. They want it to look right the first time, because it will be
+printed, posted and sent around.
 
-### Form & preview (December 2023)
+Different families also need different words: a mother and a father, a rabbi
+and a teacher, a religious burial and a civil farewell.
 
-The look of EvelPost arrived: grouped card sections (פתיח, שם המנוח, הלוויה,
-שבעה), the warm brown palette, the form and the notice side by side, an
-optional nickname shown in parentheses, and an optional Hebrew date.
+> This portrait comes from the original experience behind the project and
+> from reviewing the product. It hasn't been tested with users yet. See
+> [What this is based on](#what-this-is-based-on).
 
-![Form and preview side by side](img/stage2-form-desktop.png)
+## What a good experience has to be
 
-### v1: export and mobile (January – February 2024)
+| Principle | In practice |
+| --- | --- |
+| **Calm** | Nothing makes a person feel behind, wrong or tested. |
+| **Recognisable** | The result looks like the notices people already know. |
+| **Inclusive** | One familiar structure, wording that fits many families. |
+| **Forgiving** | Skip anything, change anything, lose nothing. |
+| **Trustworthy at the end** | The file is right the first time they save it. |
 
-v1 added the ייצוא לקובץ button, which opens the notice in a new tab and calls
-the browser's print dialog (A4 landscape), and a mobile layout where the form
-stacks above the notice.
+## The problem with the form
 
-![v1 on desktop](img/v1-desktop.png)
+v1 and v2 followed the usual pattern: a column of fields, and a preview of the
+result. It looks tidy, but it asks a person in grief to do three things:
 
-| v1 export (print dialog, Chromium) |
-| --- |
-| ![v1 export](img/v1-export.png) |
+1. **Translate.** Read a field label ("קרבה", "כתובת בית העלמין") and
+   imagine where its answer will land on the notice.
+2. **Look back and forth** between the fields and the preview to check.
+3. **Trust** that a half-finished notice will turn out right.
 
-Limits of v1, fixed in v2: the page was declared English (`lang="en"`), user
-text went into the page unescaped, Hebrew dates came out as `8 בכסלו 5787`
-instead of `ח׳ בכסלו תשפ״ז`, line breaks in the mourners field were lost, and
-the export waited for the new tab's load event, which after `document.write`
-can fire before anything listens for it, leaving the export stuck.
+And in v2 the empty and half-filled notice looked broken: a lone `ז"ל`,
+`הלוויה תתקיים ב,`, `בשעה .` Fragments like that read as errors, at the
+moment a person least needs to feel they're getting something wrong.
 
-### v2: the refresh (June 2026, current production)
+| v2, before anything is typed | v3, before anything is typed |
+| --- | --- |
+| ![v2 empty](img/v2-empty.png) | ![v3 empty](img/v3-empty.png) |
 
-A large rewrite of the same form-and-preview design: a choice of opening
-lines (or your own), an optional title, Hebrew dates in Hebrew numerals,
-local date parsing (no off-by-one day), escaped user input, drafts saved in
-the browser, a reset button, and a notice sized relative to its own width so
-the printed page matches the preview.
+## The change: show the notice, not a form
 
-![v2 on desktop](img/v2-desktop.png)
+People already know what a death notice looks like. So in v3 the page opens
+on a notice, with faded examples in the places still to be filled in, and
+**each part of the notice is the control for that part**: tap the name to
+write the name, tap the funeral details to write the funeral. A short step
+opens with only the questions for that part, phrased the way a person would
+ask them: *על מי המודעה?* · *מתי ואיפה נפרדים?* · *איפה יושבים שבעה?* · *מי
+האבלים?*
 
-The full record, including what is wrong with it, is in
-[v2-production.md](v2-production.md).
+Anyone who prefers to be led can follow the numbered steps with "הבא"; nobody
+is forced to.
 
-### v3: notice-first (November 2026)
-
-The form is gone. The notice is the interface: tap any part of it and a short
-step opens for just that part. The rest of this document explains why and
-what changed.
-
-![v3 on desktop](img/v3-desktop.png)
-
-### On phones, version by version
-
-From left: prototype, form & preview, v1, v2, v3. In every version before v3,
-the notice is at the bottom of a long form: you type without seeing the
-result. In v3 the notice stays pinned at the top while you type.
-
-![The five versions on a phone](img/mobile-evolution.png)
-
-## From v2 to v3: what we improved
-
-The portfolio case study sets out what the tool has to be: user-friendly,
-customisable and simple, accessible, free, close to the familiar format,
-and printable on home equipment. It also names the next step: supporting
-different groups and their language. The review of v2 against those goals
-found these gaps:
-
-| Area | v2 (production) | v3 |
+|  | v2 | v3 |
 | --- | --- | --- |
-| Interaction | A long form (16 controls) in four sections | Tap the part of the notice you want to change; optional 6-step guide |
-| Empty state | Broken fragments (`ז"ל`, `הלוויה תתקיים ב,`) | Faded example text in place |
-| Fitting text | Fixed size; overflow is cut off silently | Shrinks to fit; never cut off |
-| Long names | Wrap mid-name, dangling hyphen | Each part kept whole; shrinks if too wide |
-| Gender | Male only (פטירתו) | הוא / היא (פטירתו / פטירתה) |
-| Honorific | Always ז"ל | ז״ל, ע״ה, זצ״ל, הי״ד or none |
-| Ceremony | הלוויה | הלוויה, הלוויה אזרחית or טקס פרידה |
-| Output | Print dialog only | PDF file and PNG image, built in the browser |
-| PDF reliability | Depends on browser and dialog settings | Same file in every browser, checked before it is offered |
-| Sharing | None | Share sheet on phones (e.g. WhatsApp) |
-| Seeing the result | Preview scrolls away; below the form on phones | Notice stays in view; last step shows the exact output |
-| Printing at home | Heavy frame only, landscape only | Thin, ink-saving frame; portrait or landscape |
-| Dependencies | Google Fonts and a CSS CDN | Self-contained |
+| What you see first | A long form, and an empty frame | The notice, with examples in place |
+| What you decide first | Where to start among 16 fields | Which part you want to write |
+| What's on screen at once | 16 fields | One step: 1 to 8 controls |
+| How you check your work | Look away from the field to the preview | The text changes where you are typing |
+| A half-finished notice | Looks broken | Always looks like a notice |
 
-### 1. From a form to the notice itself
+## The journey, before and after
 
-**v2.** The page opens on a long form beside an empty frame. The notice is
-something you get after filling in fields; what each field does is only
-visible by watching the preview change.
+| Moment | v1 and v2 | v3 |
+| --- | --- | --- |
+| **Arriving** | A form. The notice is a by-product. | The notice, with a one-line invitation: *tap any part to fill it in; skip anything that doesn't fit.* |
+| **Writing** | Type, look at the preview, repeat. On a phone the preview is below the whole form, so you type blind. | The notice is pinned above the fields on a phone and stays beside them on a desktop. |
+| **Missing details** | The notice shows broken fragments. | Faded examples. Missing details are only mentioned on the last step, as tappable chips, never as errors. |
+| **Lots of text** | The text is silently cut off at the frame. In our test notice, two of the four mourner lines and part of the shiva details disappeared. | The text shrinks to fit. Nothing is lost. |
+| **Their family** | One wording: a man, `ז"ל`. | הוא or היא, a choice of honorific, a civil ceremony, an optional opening. |
+| **Checking** | Same view as while typing. | The last step shows exactly what will be saved. |
+| **Saving** | The browser's print dialog, whose result depends on the browser. | A real PDF or image, previewed before it is saved. |
+| **Sharing** | Not supported. | On phones, the share sheet (WhatsApp and the like). |
+| **Starting over** | Reset deletes everything at once. | It asks first. Drafts save themselves. |
 
-**v3.** The page opens on the notice. Each part of it (the opening, the name,
-the funeral, the shiva, the mourners) is a target: tap it and only that part's
-questions open, worded the way a person would ask them (״על מי המודעה?״,
-״מתי ואיפה נפרדים?״). A row of six steps, and a "הבא" button, guide anyone who
-wants to go in order; nothing forces them to.
+![The versions on a phone, left to right: prototype, form & preview, v1, v2, v3](img/mobile-evolution.png)
+*On a phone, from left: the first prototype, form and preview, v1, v2, v3. In
+every version before v3 the notice sits under the whole form.*
 
-This is the "guidance without pressure" decision from the case study taken
-further: fewer fields in view at once, and the familiar format of the notice
-doing the explaining.
+## Design decisions, and what each one costs
 
-### 2. An empty notice that guides instead of looking broken
+### 1. Show the thing, not the form
 
-| v2: empty | v3: empty |
-| --- | --- |
-| ![v2 empty state](img/v2-empty.png) | ![v3 empty state](img/v3-empty.png) |
+- **What we saw.** A form makes people think in data ("fill in the relation
+  field"), and a notice is something they already understand as a whole.
+- **What we decided.** The notice is the interface. Each part is a button
+  (mouse, touch or keyboard) that opens its own short step. The active part
+  is outlined on the notice, so it's always clear what you are editing.
+- **What it costs.** An overview of every field at once is gone, and tapping
+  a picture is less obvious than filling a field. We compensate with a line of
+  instruction under the title, an outline when you hover or focus a part, a
+  numbered step row and a "next" button: three ways in, all landing on the same
+  place. *Whether people discover this unaided is the first thing to test.*
 
-v2 assembles the notice from whatever is filled in, so an empty or partial
-form shows fragments: a lone `ז"ל`, `הלוויה תתקיים ב,`, `בשעה .`. v3 shows a
-faded example in each empty place (`שם פרטי`, `בשעה ...`) that disappears as
-the real text arrives. Examples never reach the file, and neither does a line
-left incomplete without them (an announcement line with no relation, a
-funeral line with no date).
+### 2. Guidance without pressure
 
-### 3. Nothing is cut off
+- **What we saw.** Nearly every detail of a notice arrives late or is
+  optional, and a form that insists on all of it makes people feel behind.
+- **What we decided.** Nothing is required. Empty places show a faded example
+  of what could go there. The last step lists what's still empty as small
+  tappable chips, and the tone is "you haven't filled in" rather than
+  "error".
+- **What it costs.** The product no longer prevents an incomplete notice. We
+  accept that, because a notice with the funeral time still to come is
+  normal, and the person knows their own situation better than we do.
 
-In v2 the notice has a fixed text size and anything that doesn't fit is
-clipped at the frame, without warning. With the test notice, the last line of
-the shiva details and two of the four mourner lines are missing, on screen
-and in the printout. The same happened in every version before it.
+### 3. One structure, many families
 
-v3 fits the text to the frame: it finds the largest size at which everything
-fits (a binary search over the base size), then shrinks only the name if a
-single word of it is still too wide. Line breaks stay where the person typed
-them; the text gets smaller rather than re-wrapping an address, and time
-ranges like `10:00-13:00` never break at the hyphen. The fit is repeated at
-print size before export, with a little headroom, so rounding can't clip the
-file.
+- **What we saw.** The first version could only write a notice for a man, with
+  `ז"ל` after the name. Anyone else got the wrong words and had to fix them
+  on paper.
+- **What we decided.** Keep the familiar structure and let the wording change
+  inside it: הוא / היא (פטירתו / פטירתה, and the questions follow), an honorific
+  after the name (ז״ל, ע״ה, זצ״ל, הי״ד or none), a ceremony (הלוויה, הלוויה
+  אזרחית or טקס פרידה, with the grammar following), and an optional opening
+  line.
+- **What it costs.** These are curated lists, not free text, and they don't
+  cover every community. The wording was written by us and **must be
+  reviewed by people from the communities it serves**, religious and secular,
+  before we call it done.
 
-### 4. Wording for different people
+### 4. The notice always fits
 
-The case study names "representing different people" as a core challenge.
-v2 could only produce a notice for a man (`אנו מודיעים על פטירתו של`) with
-`ז"ל` after the name. v3 adds:
+- **What we saw.** In v1 and v2, adding more text meant it was silently cut
+  off at the frame. The only control was a size slider for the name.
+- **What we decided.** The text finds its own size, so everything that was
+  typed is visible, a long name shrinks by itself, and the person's own line
+  breaks stay where they put them (an address is not re-wrapped).
+- **What it costs.** Very long content makes small text, and the notice is
+  always a single page. We chose that over a notice that hides words or
+  spills onto a second sheet.
 
-- **הוא / היא**: פטירתו or פטירתה; the relation question and its example
-  follow too (״מי היא הייתה בשבילכם?״).
-- **After the name**: ז״ל, ע״ה, זצ״ל, הי״ד, or nothing for families who
-  don't use one. Written with the proper gershayim (״), not a quote mark.
-- **The ceremony**: הלוויה, הלוויה אזרחית, or טקס פרידה, with correct
-  grammar (טקס הפרידה **י**תקיים).
-- An opening line can now also be left out.
+### 5. Finish properly
 
-![A woman's notice, portrait, thin frame](img/v3-export-portrait.png)
+- **What we saw.** The hardest moment to fail is the last one, after someone
+  has filled everything in. In v2 the final step is handed to the browser's
+  print dialog. When we ran the test notice through it, the page came out
+  shifted and split over two sheets (in Chromium's print-to-PDF, not yet
+  seen on a real device).
 
-### 5. An export people can trust
+  | v2 export, page 1 | v2 export, page 2 |
+  | --- | --- |
+  | ![v2 page 1](img/v2-export-page1.png) | ![v2 page 2](img/v2-export-page2.png) |
 
-The worst moment for a tool like this to fail is at the end, after someone
-has carefully filled everything in. v2 hands the notice to the browser's
-print dialog, so the result depends on the browser, its margin and scaling
-settings, and whether pop-ups are allowed.
+- **What we decided.** The product makes the file itself, as an exact A4 PDF
+  or an image, and shows it before it is saved, so nobody downloads a
+  surprise. On phones it opens the share sheet. If something does go wrong,
+  the message says the details are safe and offers to try again or print
+  directly. A broken file is never handed over.
 
-When the test notice was exported from v2 through Chromium's print-to-PDF at
-100% scale, the notice came out shifted off the page and split over two
-pages:
+  ![v3 export](img/v3-export.png)
 
-| v2 export, page 1 | v2 export, page 2 |
-| --- | --- |
-| ![v2 export page 1](img/v2-export-page1.png) | ![v2 export page 2](img/v2-export-page2.png) |
+  | The result, on a phone | If something fails |
+  | --- | --- |
+  | ![Result dialog](img/v3-result-dialog-phone.png) | ![Error dialog](img/v3-export-error.png) |
 
-The likely cause: the export window loads the app's stylesheet, whose `body`
-is a centred flex layout with `min-height: 100vh`, and v2 does not size that
-`body` to the page. The A4-sized notice is then centred against the window
-rather than the page: measured in the export window, it started 159 px from
-the left edge of a 1440 px window. v1's export window fixed its `body` at
-exactly 29.7×21 cm and exported the same notice onto one clean page, so this
-arrived with the v2 refresh. How visible it is to a real person depends on
-the browser and its "fit to page" setting; it was reproduced in the print
-engine, not observed on a real device.
+- **What it costs.** The PDF is a high-resolution picture of the notice, so
+  its text can't be selected or searched. That's what makes it look identical
+  in every browser.
 
-v3 does not use the print dialog to make the file:
+### 6. See it while you type
 
-1. It lays out a clean copy of the notice at 300 dpi A4 (3508×2480 px) off
-   screen and fits it again at that size.
-2. It renders that copy to an image with the font embedded. Safari gets a
-   warm-up render, because it often drops fonts the first time.
-3. It checks the render (the frame is there, the text is there) and retries.
-   If it still fails, the person is told, their details are safe, and direct
-   printing is offered. A broken file is never handed out.
-4. It writes the PDF itself: one exact A4 page with the notice's name as its
-   title. The same render is offered as a PNG for sharing.
+- **What we saw.** On a phone, the notice was at the bottom of a long form.
+- **What we decided.** The notice is pinned to the top of the screen, and the
+  step the person is editing sits below it.
+- **What it costs.** The notice takes up a good part of a small screen, so
+  each step is kept short.
 
-![v3 export](img/v3-export.png)
+![The last step: it lists what is still empty](img/v3-finish-missing.png)
+*The last step: the notice as it will be saved, and a gentle list of what's
+still empty.*
 
-Then a dialog shows the actual file before anything is saved, with download,
-share (phones) and open-to-print (desktop). Saving on a fresh tap is what lets
-phones open the share sheet, and the preview can be long-pressed and saved in
-in-app browsers (Facebook, Instagram) that block downloads.
+## What stayed the same
 
-| Result dialog on a phone | If something fails |
-| --- | --- |
-| ![Result dialog](img/v3-result-dialog-phone.png) | ![Error dialog](img/v3-export-error.png) |
+The warm palette and the typeface, the heavy black frame people recognise,
+the Hebrew date in Hebrew numerals, the saved draft, and the idea that the
+notice looks the same on screen, on paper and as a file. A draft written in
+v2 opens in v3 with everything in place, so nobody loses work when the new
+version goes live.
 
-Tested in Chromium, Firefox and WebKit on desktop and in iPhone and Android
-emulation: one page, exact A4, valid by `qpdf --check`, rendered by poppler,
-in 0.3–1 second. Not yet tested on a real phone or on paper.
+## How it got here
 
-### 6. Seeing what you will get
+| When | Version | What changed for the user |
+| --- | --- | --- |
+| Dec 2023 | Prototype | A form above a live notice; text sized relative to the page (a contribution by guychouk). |
+| Dec 2023 | Form & preview | Grouped sections, the warm palette, the form and the notice side by side, optional nickname and Hebrew date. |
+| Jan–Feb 2024 | **v1** | Export through the print dialog; a phone layout. |
+| Jun 2026 | **v2** (live today) | Opening lines to choose from, optional title, Hebrew dates in Hebrew numerals, saved drafts, safer handling of what people type. |
+| Nov 2026 | **v3** | A different model: the notice is the interface. Inclusive wording, text that fits, a reliable file, sharing. |
 
-On phones, every earlier version put the notice below the whole form. v3 pins
-the notice to the top of the screen while you type. On desktop it stays in
-view beside the steps.
+Between v1 and v2 the improvements were real but stayed inside the same
+model: a form beside a preview. v3 is the first version that changes the
+model.
 
-The last step switches the notice to exactly what the file will contain, and
-lists essential details that are still empty; each one is a button that goes
-straight to that field.
+![v1](img/v1-desktop.png)
+*v1 (Feb 2024).*
 
-![Last step with missing details](img/v3-finish-missing.png)
+![Prototype](img/stage1-prototype-desktop.png)
+*The first prototype (Dec 2023): note that the text is already cut off.*
 
-### 7. Smaller things
+## What this is based on
 
-- Self-hosted font and image library: no requests to Google Fonts or a CDN.
-- Placeholder text contrast raised from 2.3:1 to 4.3:1.
-- Keyboard access to every part of the notice; real labels and fieldsets for
-  the choices.
-- "Start a new notice" asks before deleting everything (v2 cleared at once).
-- The page title is Hebrew, matching the page.
+Being clear about this matters more than sounding certain.
 
-### What v3 keeps from v2
+- **What we did:** a design review of the live product (v2) against the
+  project's goals and common usability principles, with the same test notice
+  entered in every version; measuring the actual output (page counts, cut-off
+  text, the empty state); and testing v3 in three browser engines, and in
+  iPhone and Android emulation.
+- **What we have not done:** user testing. The picture of the person and
+  their moment is informed by the original experience, not by interviews.
+  Claims such as "easier" are design judgements until people have tried it.
+- **Not yet tested:** a real phone's share sheet, WhatsApp's in-app browser,
+  real Safari, printing on paper.
 
-The palette and typeface, the sizing of the notice relative to its own width
-(the idea that makes screen, paper and image match), the Hebrew date in
-Hebrew numerals, local date handling, escaping of everything the user types,
-and drafts saved in the browser. v3 reads v2's drafts (tested: a draft saved
-by v2 opens in v3 with every field in place, and the new choices default to
-v2's behaviour), so nobody loses a draft when the new version goes live.
+### What we'd do next
 
-## Method
+1. **Try it with five people**, on their phones, each making a notice from a
+   short made-up scenario (including one with a woman and one civil
+   ceremony). Watch where they hesitate. Does anyone fail to find that the
+   notice is tappable? Does anyone get stuck at the end?
+2. **Have the wording reviewed** by people from different communities.
+3. **Compare with v2** if possible: the same scenario on both, to see whether
+   v3 is actually faster and calmer rather than just different.
 
-- Each version was exported from git (`git archive <ref>`) and served
-  locally; the test notice was entered by script through the same form
-  fields, which have kept their ids since 2023.
-- Export of v1 and v2: their own export button, with the resulting print
-  window saved through Chromium's print-to-PDF at 100% scale. Export of v3:
-  its PDF download.
-- PDFs were checked with `pdfinfo` and `qpdf --check`, and rendered with
-  poppler's `pdftoppm`.
-- Firefox and WebKit ran in the official Playwright Docker image.
+## Read more
+
+- [v2: the live version](v2-production.md): what it does and where people run
+  into trouble.
+- [v3: the new version](v3-notice-first.md): what it does.
+- [technical-notes.md](technical-notes.md): how it's built and tested, and the
+  test notice used in every screenshot.
+- [../CHANGELOG.md](../CHANGELOG.md)

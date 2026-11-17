@@ -9,9 +9,9 @@ plainly worded step opens for just that part. Parts you haven't filled yet
 show a faded example in place, and "הבא" walks you through the steps in order
 if you want guidance.
 
-How the tool got here, from the first version to this one, with
-screenshots of each: [docs/evolution.md](docs/evolution.md). Version history:
-[CHANGELOG.md](CHANGELOG.md).
+The product story, from the first version to this one, with screenshots:
+[docs/evolution.md](docs/evolution.md). Version history:
+[CHANGELOG.md](CHANGELOG.md). How it's built: [docs/technical-notes.md](docs/technical-notes.md).
 
 ## Features
 
