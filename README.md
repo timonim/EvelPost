@@ -9,6 +9,10 @@ plainly worded step opens for just that part. Parts you haven't filled yet
 show a faded example in place, and "הבא" walks you through the steps in order
 if you want guidance.
 
+How the tool got here, from the first version to this one, with
+screenshots of each: [docs/evolution.md](docs/evolution.md). Version history:
+[CHANGELOG.md](CHANGELOG.md).
+
 ## Features
 
 - **Edit on the notice**: click or tap a region to edit it; a six-step guide
