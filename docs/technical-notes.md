@@ -109,3 +109,12 @@ Placeholder contrast was raised from 2.3:1 to 4.3:1. Every part of the notice
 is keyboard-reachable (Tab, Enter or Space). Choices use real fieldsets and
 legends; the status line is a live region. Not yet audited with a screen
 reader.
+
+## Demo mode
+
+`?demo` (used by the portfolio's embed) loads `demo.js`: a soft cursor taps
+each part of the notice and the text types itself in, then the finished
+notice is shown, in a loop. It never reads or writes the saved draft, never
+moves focus (which would scroll a page embedding it), plays only while the
+notice is on screen, and stops for good at the visitor's first click or key
+press. With reduced motion it shows the finished notice without animation.

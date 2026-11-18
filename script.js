@@ -2,6 +2,10 @@
 
 const STORAGE_KEY = 'evelpost-form';
 
+// ?demo plays a short demonstration (demo.js), e.g. inside the portfolio.
+// It never reads or writes the visitor's saved draft.
+const DEMO = new URLSearchParams(location.search).has('demo');
+
 const form = document.getElementById('editor');
 const notice = document.getElementById('notice');
 const textSizeSlider = document.getElementById('text-size');
@@ -368,6 +372,7 @@ function getControls() {
 }
 
 function saveDraft() {
+  if (DEMO) return;
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(readValues()));
   } catch (error) {
@@ -376,6 +381,7 @@ function saveDraft() {
 }
 
 function restoreDraft() {
+  if (DEMO) return;
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return;
@@ -870,3 +876,9 @@ new ResizeObserver(() => {
   form.style.setProperty('--stage-height', sticky ? `${stage.offsetHeight + 16}px` : '0px');
 }).observe(stage);
 document.fonts?.ready.then(() => fitNotice());
+
+if (DEMO) {
+  const demoScript = document.createElement('script');
+  demoScript.src = 'demo.js';
+  document.body.append(demoScript);
+}
