@@ -48,6 +48,27 @@
     @keyframes demo-tap {
       50% { box-shadow: 0 0 0 2px #fff, 0 0 0 10px rgba(147, 107, 81, 0.25); }
     }
+    /* Embedded as a showcase: centre the app in its frame, and on wide
+       frames give the notice more of the width. */
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 100vh;
+      min-height: 100svh;
+    }
+    .app-header,
+    .workspace {
+      width: 100%;
+    }
+    @media (min-width: 1001px) {
+      body { padding: 1.5rem 2rem; }
+      .workspace {
+        grid-template-columns: minmax(18rem, 23rem) minmax(0, 1fr);
+        gap: 2.5rem;
+        max-width: 90rem;
+      }
+    }
   `;
   document.head.append(style);
 
