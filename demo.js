@@ -140,6 +140,12 @@
 
   async function play() {
     clearNotice();
+    // First appear over the notice, not in a corner.
+    const start = notice.getBoundingClientRect();
+    cursor.style.transition = 'none';
+    cursor.style.transform = `translate(${start.left + start.width / 2}px, ${start.top + start.height / 2}px)`;
+    void cursor.offsetWidth;
+    cursor.style.transition = '';
     await wait(1600); // the empty notice, with its examples
     for (const { step, fields } of DEMO_NOTICE) {
       await tap(notice.querySelector(`.region[data-step="${step}"]`));
